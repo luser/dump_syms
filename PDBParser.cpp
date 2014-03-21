@@ -1,0 +1,1478 @@
+// Copyright (C) 2013 Jake Shadle
+//
+// Permission is hereby granted, free of charge, to any person obtaining
+// a copy of this software and associated documentation files (the "Software"),
+// to deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+// SOFTWARE.
+
+// Original author: Jake Shadle <jshadle@dice.se>
+
+#include "PDBParser.h"
+
+#include "utils.h"
+#include <assert.h>
+#include <algorithm>
+#include <atlfile.h>
+#include <ppl.h>
+
+namespace google_breakpad
+{
+
+PDBParser::FunctionRecord& PDBParser::FunctionRecord::operator =(FunctionRecord&& other)
+{
+	std::swap(name, other.name);
+	std::swap(lines, other.lines);
+	std::swap(lineCount, other.lineCount);
+	std::swap(segment, other.segment);
+	std::swap(offset, other.offset);
+	std::swap(fileIndex, other.fileIndex);
+	std::swap(length, other.length);
+	std::swap(lineOffset, other.lineOffset);
+	std::swap(typeIndex, other.typeIndex);
+
+	return *this;
+}
+
+uint32_t
+getNumPages(uint32_t length, uint32_t pageSize)
+{
+	uint32_t numPages = length / pageSize;
+	if (length % pageSize)
+		numPages += 1;
+
+	return numPages;
+}
+
+class StreamReader
+{
+public:
+	StreamReader(const PDBParser::StreamPair& stream, const PDBParser& parser, uint32_t offset = 0)
+		: m_stream(stream)
+		, m_parser(parser)
+		, m_offset(0xffffffff)
+		, m_pageIndex(0xffffffff)
+		, m_pageEndIndex(0)
+		, m_data(nullptr)
+		, m_seqPageEnd(nullptr)
+	{
+		seek(offset);
+	}
+
+	uint32_t getOffset() const { return m_offset; }
+	const uint8_t* getData() const { return m_data; };
+
+	static const uint8_t* getData(const PDBParser::StreamPair& stream, const PDBParser& parser, uint32_t offset = 0)
+	{
+		int index = offset / parser.pageSize();
+
+		const uint8_t* base = parser.data() + stream.pageIndices[index] * parser.pageSize();
+		base += offset % parser.pageSize();
+
+		return base;
+	}
+
+	void align(uint32_t align)
+	{
+		uint32_t diff = m_offset % align;
+
+		if (diff)
+			seek(m_offset + align - diff);
+	}
+
+	void seek(uint32_t offset)
+	{
+		if (offset == m_offset)
+			return;
+
+		uint32_t index = offset / m_parser.pageSize();
+
+		if (index == m_pageIndex)
+		{
+			if (offset > m_offset)
+				m_data += offset - m_offset;
+			else
+				m_data -= m_offset - offset;
+
+			m_offset = offset;
+			return;
+		}
+
+		const uint8_t* base = m_parser.data() + m_stream.pageIndices[index] * m_parser.pageSize();
+		m_data = base + offset % m_parser.pageSize();
+		m_offset = offset;
+		m_pageIndex = index;
+
+		/*if (m_pageIndex < m_pageEndIndex)
+		return;*/
+
+		// Check to see if we have any non-adjacent pages
+		size_t count = m_stream.pageIndices.size();
+		size_t last = count - 1;
+		if (index == last)
+		{
+			m_seqPageEnd = base + m_parser.pageSize();
+			m_pageEndIndex = (uint32_t)last;
+
+			assert(m_seqPageEnd > m_data);
+			return;
+		}
+		else if (m_stream.pageIndices[index] + count - index != m_stream.pageIndices[last])
+		{
+			// Scan forward to find the first non-adjacent page
+			uint32_t expected = m_stream.pageIndices[index] + 1;
+			for (size_t i = index + 1; i < count; ++i)
+			{
+				if (expected++ != m_stream.pageIndices[i])
+				{
+					m_seqPageEnd = m_parser.data() + m_stream.pageIndices[i - 1] * m_parser.pageSize() + m_parser.pageSize();
+					m_pageEndIndex = (uint32_t)i - 1;
+
+					assert(m_seqPageEnd > m_data);
+					return;
+				}
+			}
+		}
+
+		m_seqPageEnd = m_parser.data() + m_stream.pageIndices[last] * m_parser.pageSize() + m_parser.pageSize();
+		m_pageEndIndex = (uint32_t)last;
+
+		assert(m_seqPageEnd > m_data);
+	}
+
+	template<typename T>
+	T peek()
+	{
+		// Verify!
+		if (m_data + sizeof(T) > m_seqPageEnd)
+		{
+			uint32_t offset = m_offset;
+
+			T retValue;
+			uint8_t* outVal = (uint8_t*)&retValue;
+			uint32_t toRead = sizeof(T);
+
+			while (toRead > 0)
+			{
+				uint32_t seqRead = min((uint32_t)(m_seqPageEnd - m_data), toRead);
+
+				// Hack
+				if (seqRead == 0)
+				{
+					--m_offset;
+					seek(m_offset + 1);
+				}
+
+				memcpy(outVal, m_data, seqRead);
+
+				seek(m_offset + seqRead);
+
+				toRead -= seqRead;
+				outVal += seqRead;
+			}
+
+			// Return back to the original position
+			seek(offset);
+
+			return retValue;
+		}
+		else
+			return *((const T*)m_data);
+	}
+
+	template<typename T>
+	DataPtr<T> read(uint32_t size = 0)
+	{
+		uint32_t toRead = size == 0 ? sizeof(T) : size;
+
+		// Check to see if the data is split across multiple pages
+		if (m_data + toRead > m_seqPageEnd)
+		{
+			uint8_t* alloced = (uint8_t*)malloc(toRead);
+			uint8_t* outPos = alloced;
+
+			while (toRead > 0)
+			{
+				uint32_t seqRead = min((uint32_t)(m_seqPageEnd - m_data), toRead);
+
+				// Hack
+				if (seqRead == 0)
+				{
+					--m_offset;
+					seek(m_offset + 1);
+				}
+
+				memcpy(outPos, m_data, seqRead);
+
+				seek(m_offset + seqRead);
+
+				toRead -= seqRead;
+				outPos += seqRead;
+			}
+
+			return DataPtr<T>(alloced, true);
+		}
+		else
+		{
+			DataPtr<T> read(m_data);
+
+			m_data += toRead;
+			m_offset += toRead;
+
+			return read;
+		}
+	}
+
+	DataPtr<char> readString()
+	{
+		uint32_t origOffset = m_offset;
+		const uint8_t* toCopy = m_data;
+		uint32_t strLen = 0;
+		bool needsSeek = false;
+
+		do
+		{
+			if (*toCopy++ == 0)
+			{
+				if (needsSeek)
+					seek(origOffset);
+
+				return read<char>(strLen + 1);
+			}
+
+			++strLen;
+
+			if (toCopy == m_seqPageEnd)
+			{
+				needsSeek = true;
+				seek(m_offset + strLen);
+				toCopy = m_data;
+			}
+		} while(true);
+	}
+
+private:
+
+	const PDBParser::StreamPair&	m_stream;
+	const PDBParser&				m_parser;
+
+	const uint8_t*					m_data;
+	const uint8_t*					m_seqPageEnd;
+	uint32_t						m_offset;
+	uint32_t						m_pageIndex;
+	uint32_t						m_pageEndIndex;
+};
+
+void
+PDBParser::load(const char* path)
+{
+	CAtlFile file;
+	HRESULT result = file.Create(path, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING);
+	if (FAILED(result))
+		throw std::exception("Failed to load PDB file");
+
+	m_mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, 0);
+	if (m_mapFile == nullptr)
+		throw std::exception("Failed to create file mapping");
+
+	m_base = (uint8_t*)MapViewOfFile(m_mapFile, FILE_MAP_READ, 0, 0, 0);
+
+	if (m_base == nullptr)
+		throw std::exception("Failed to map view of file");
+
+	if (!readRootStream())
+		throw std::exception("Failed to read PDB Root Stream");
+
+	// Find and read the executable that is paired with this PDB,
+	// because unfortunately the PDB doesn't contain the necessary info
+	// we need, which seems very wrong...
+	m_filename = path;
+	m_filename.erase(m_filename.size() - 3, 3);
+	m_filename += "exe";
+
+	m_isExe = true;
+
+	// Get the exe header, don't use ImageLoad since it loads the entire exe into memory
+	// which is completely unnecessary as we only need some info from the header
+	FILE* exeFile = nullptr;
+	if (fopen_s(&exeFile, m_filename.c_str(), "rb") != 0)
+	{
+		// Try .dll
+		m_filename.erase(m_filename.size() - 3, 3);
+		m_filename += "dll";
+		if (fopen_s(&exeFile, m_filename.c_str(), "rb") != 0)
+			throw std::exception("Failed to find paired exe/dll file");
+
+		m_isExe = false;
+	}
+
+	m_filename.erase(m_filename.size() - 3, 3);
+	size_t loc = m_filename.find_last_of('\\');
+	if (loc == std::string::npos)
+		loc = m_filename.find_last_of('/');
+
+	if (loc != std::string::npos)
+		m_filename.erase(0, loc + 1);
+
+	do
+	{
+		IMAGE_DOS_HEADER dosHeader;
+		fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, exeFile);
+
+		if (dosHeader.e_magic != 23117 /* "PE\0\0" */)
+			throw std::exception("Invalid PE header detected");
+
+		fseek(exeFile, dosHeader.e_lfanew, SEEK_SET);
+
+		IMAGE_NT_HEADERS64 header;
+		fread(&header, sizeof(IMAGE_NT_HEADERS64), 1, exeFile);
+
+		// Ignore this if it's powerPC because...xenon
+		// Detect if the executable/dll is actually a CLR assembly, which is not supported
+		if (header.FileHeader.Machine == 0x01F2 && header.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
+			throw std::exception("The image is a CLR assembly, which is not supported");
+
+		m_PETimeStamp = header.FileHeader.TimeDateStamp;
+
+		if (header.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+			m_PESize = header.OptionalHeader.SizeOfImage;
+		else
+			m_PESize = ((IMAGE_NT_HEADERS32*)&header)->OptionalHeader.SizeOfImage;
+	} while(0);
+
+	fclose(exeFile);
+}
+
+bool
+PDBParser::readRootStream()
+{
+	const PDBHeader* header = (const PDBHeader*)m_base;
+	const char validSignature[] = {"Microsoft C/C++ MSF 7.00\r\n\032DS\0\0"};
+
+	if (memcmp(header->signature, validSignature, sizeof(validSignature)) != 0)
+	{
+		fprintf(stderr, "Input file has an invalid signature\n");
+		return false;
+	}
+
+	m_pageSize = header->pageSize;
+	m_numPages = header->pagesUsed;
+
+	uint32_t rootSize = header->directorySize;
+	uint32_t numRootPages = getNumPages(rootSize, m_pageSize);
+	uint32_t numRootIndexPages = getNumPages(numRootPages * 4, m_pageSize);
+
+	// This should hopefully always be the case...
+	if (numRootIndexPages != 1)
+	{
+		fprintf(stderr, "Too many root index pages...\n");
+		return false;	
+	}
+
+	uint32_t rootIndex = header->tocPageIndex;
+	const uint32_t* rootPageList = (const uint32_t*)(m_base + rootIndex * m_pageSize);
+
+	uint32_t pageIndex = 0;
+	uint32_t pageOffset = 0;
+	const uint32_t* page = (const uint32_t*)(m_base + rootPageList[pageIndex] * m_pageSize);
+
+	// The first 4 bytes are how many streams we actually need to read
+	uint32_t numStreams = *page;
+	++pageOffset;
+
+	m_streams.reserve(numStreams);
+
+	const uint32_t numItems = m_pageSize / sizeof(uint32_t);
+
+	// Read all of the sizes for each stream, which directly determines how many
+	// page indices we need to read after them
+	{
+		uint32_t streamIndex = 0;
+		do
+		{
+			for (; streamIndex < numStreams && pageOffset < numItems; ++streamIndex, ++pageOffset)
+			{
+				uint32_t size = page[pageOffset];
+				if (size == 0xFFFFFFFF)
+					m_streams.push_back(StreamPair(0));
+				else
+					m_streams.push_back(StreamPair(size));
+			}
+
+			// Advance to the next page
+			if (pageOffset == numItems)
+			{
+				page = (const uint32_t*)(m_base + rootPageList[++pageIndex] * m_pageSize);
+				pageOffset = 0;
+			}
+		} while (streamIndex < numStreams);
+	}
+	
+	// For each stream, get the list of page indices associated with each one,
+	// since any data associated with a stream are not necessarily adjacent
+	for (uint32_t i = 0; i < numStreams; ++i)
+	{
+		uint32_t numPages = getNumPages(m_streams[i].size, m_pageSize);
+
+		if (numPages != 0)
+		{
+			m_streams[i].pageIndices.resize(numPages);
+
+			uint32_t numToCopy = numPages;
+			do 
+			{
+				uint32_t num = min(numToCopy, numItems - pageOffset);
+				memcpy(m_streams[i].pageIndices.data() + numPages - numToCopy, page + pageOffset, sizeof(uint32_t) * num);
+				numToCopy -= num;
+				pageOffset += num;
+
+				if (pageOffset == numItems)
+				{
+					page = (const uint32_t*)(m_base + rootPageList[++pageIndex] * m_pageSize);
+					pageOffset = 0;
+				}
+			} while (numToCopy);
+		}
+	}
+
+	const uint8_t* data = StreamReader::getData(m_streams[1], *this);
+	const NameIndexHeader* niHeader = (const NameIndexHeader*)data;
+
+	m_guid = niHeader->guid;
+
+	// The assumption is made that all of the name indices are in adjacent pages, this seems to hold
+	// true...
+	const char* names = ((const char*)data + sizeof(NameIndexHeader));
+	const uint32_t* pdw = (const uint32_t*)(names + niHeader->names);
+
+	uint32_t numOK = *pdw++;
+	uint32_t count = *pdw++;
+	const uint32_t* ok_bits = pdw;
+	pdw += *ok_bits++ + 1;
+	if (*pdw++ != 0)
+		return false;
+
+	for (uint32_t i = 0; i < count; ++i)
+	{
+		if (ok_bits[i >> 5] & (1 << (i % 32)))
+		{
+			uint32_t strid = *pdw++;
+			uint32_t streamid = *pdw++;
+			const char* tempname = &names[strid];
+			
+			std::string name(tempname);
+			strupper((char*)name.c_str());
+			
+			m_nameIndices.insert(std::make_pair(std::move(name), streamid));
+
+			numOK--;
+		}
+	}
+
+	return numOK == 0;
+}
+
+void
+PDBParser::loadNameStream(NameStream& names)
+{
+	auto nIter = m_nameIndices.find("/NAMES");
+	if (nIter == m_nameIndices.end())
+		throw std::exception("Could not find /NAMES in name indices");
+
+	struct NameStreamHeader
+	{
+		uint32_t sig;
+		int32_t	 version;
+		int32_t  offset;
+	};
+
+	auto& ns = getStream(nIter->second);
+
+	// Die in a fire microsoft.
+	// Explanation - Every pdb I have tested puts streams in sequential order
+	// so I assumed that was always the case, but no, apparently incorrect!
+	// This was only encountered in one PDB in this one stream, so for now, just do this once.
+	// Obviously the way to always be 100% correct all the time is to copy the entire stream into sequential
+	// memory, but we don't want to do that if we don't have to
+	char* tempData = new char[ns.size];
+	names.buffer = tempData;
+
+	uint32_t last = (uint32_t)ns.pageIndices.size() - 1;
+	for (uint32_t i = 0, end = last; i < end; ++i)
+		memcpy(tempData + i * m_pageSize, m_base + ns.pageIndices[i] * m_pageSize, m_pageSize);
+
+	// The last page may be shorter than the actual page size
+	memcpy(tempData + last * m_pageSize, m_base + ns.pageIndices[last] * m_pageSize, min(m_pageSize, ns.size - last * m_pageSize));
+
+	const NameStreamHeader* nsh = (NameStreamHeader*)tempData;
+
+	if (nsh->sig != 0xeffeeffe || nsh->version != 1)
+		throw std::exception("Invalid name stream");
+
+	const uint32_t* offsets = (uint32_t*)(tempData + sizeof(NameStreamHeader) + nsh->offset);
+	uint32_t size = *offsets++;
+
+	const char* nameStart = tempData + sizeof(NameStreamHeader);
+
+	for (uint32_t i = 0; i < size; ++i)
+	{
+		uint32_t id = *offsets++;
+		if (id != 0)
+		{
+			DataPtr<char> data(nameStart + id);
+			if (data.data != nullptr)
+				names.map.insert(std::make_pair(id, data));
+		}
+	}
+}
+
+PDBParser::TypeMap
+PDBParser::loadTypeStream()
+{
+	auto& ts = getStream(TypeInfoStream);
+
+	StreamReader reader(ts, *this);
+
+	auto tih = reader.read<TypeInfoHeader>();
+
+	TypeMap map;
+	map.reserve(tih->max - tih->min);
+	uint32_t end = reader.getOffset();
+	
+	for (uint32_t i = tih->min; i <= tih->max; ++i)
+	{
+		reader.seek(end);
+		reader.align(sizeof(TypeRecord));
+
+		auto tr = reader.read<TypeRecord>();
+		end = reader.getOffset() + tr->length - sizeof(uint16_t);
+
+		TypeInfo nfo;
+		nfo.type = (LEAF::Enum)tr->leafType;
+
+		switch (tr->leafType)
+		{
+		case LEAF::LF_MODIFIER:
+			nfo.data = reader.read<uint8_t>(sizeof(LeafModifier));
+			break;
+		case LEAF::LF_POINTER:
+			nfo.data = reader.read<uint8_t>(sizeof(LeafPointer));
+			break;
+		case LEAF::LF_PROCEDURE:
+			nfo.data = reader.read<uint8_t>(sizeof(LeafProc));
+			break;
+		case LEAF::LF_MFUNCTION:
+			nfo.data = reader.read<uint8_t>(sizeof(LeafMFunc));
+			break;
+		case LEAF::LF_ARGLIST:
+			{
+				uint32_t count = reader.peek<uint32_t>();
+				nfo.data = reader.read<uint8_t>((count + 1) * sizeof(uint32_t));
+			}
+			break;
+		case LEAF::LF_ARRAY:
+			nfo.data = reader.read<uint8_t>(sizeof(LeafArray));
+			break;
+		case LEAF::LF_CLASS:
+		case LEAF::LF_STRUCTURE:
+			{
+				reader.seek(reader.getOffset() + sizeof(LeafClass) + sizeof(uint16_t));
+				nfo.name = reader.readString();
+			}
+			break;
+		case LEAF::LF_UNION:
+			{
+				reader.seek(reader.getOffset() + sizeof(LeafUnion) + sizeof(uint16_t));
+				nfo.name = reader.readString();
+			}
+			break;
+		case LEAF::LF_ENUM:
+			{
+				reader.seek(reader.getOffset() + sizeof(LeafEnum));
+				nfo.name = reader.readString();
+			}
+			break;
+		case LEAF::LF_ALIAS:
+			{
+				reader.seek(reader.getOffset() + sizeof(LeafAlias));
+				nfo.name = reader.readString();
+			}
+			break;
+		case LEAF::LF_INDEX:
+			nfo.data = reader.read<uint8_t>(sizeof(LeafIndex));
+			break;
+		default:
+			{
+				if (nfo.type < LEAF::LF_NUMERIC || nfo.type > LEAF::LF_UTF8STRING)
+					continue;
+
+				nfo.data = reader.read<uint8_t>(end - reader.getOffset());
+			}
+			break;
+		}
+
+		map.insert(std::make_pair(i, std::move(nfo)));
+	}
+
+	return map;
+}
+
+void
+PDBParser::close()
+{
+	UnmapViewOfFile(m_base);
+	CloseHandle(m_mapFile);
+}
+
+struct global
+{
+	uint16_t leafType;
+	uint32_t symType;
+	uint32_t offset;
+	uint16_t segment;
+};
+
+struct SymbolSource
+{
+	uint16_t numModules;
+	uint16_t numModuleSources;
+};
+
+void
+PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod)
+{
+	const StreamPair& pair = getStream(DebugInfo);
+
+	StreamReader reader(pair, *this);
+	auto header = reader.read<DBIHeader>();
+
+	printHeader(header.data, of, platform);
+
+	uint32_t endOffset = reader.getOffset() + header->moduleSize;
+
+	struct Module
+	{
+		DataPtr<DBIModuleInfo>	info;
+		SrcFileIndex			srcIndex;
+		DataPtr<char>			moduleName;
+		DataPtr<char>			objectName;
+
+		Module(DataPtr<DBIModuleInfo>&& data, DataPtr<char>&& modName, DataPtr<char>&& objName)
+			: info(data)
+			, moduleName(modName)
+			, objectName(objName)
+		{}
+
+		Module(Module&& other)
+		{
+			*this = std::move(other);
+		}
+
+		Module& operator=(Module&& other)
+		{
+			info = std::move(other.info);
+			srcIndex = std::move(other.srcIndex);
+			moduleName = std::move(other.moduleName);
+			objectName = std::move(other.objectName);
+
+			return *this;
+		}
+
+	private:
+
+		Module(){}
+		Module& operator=(const Module&){ return *this; }
+	};
+
+	std::vector<Module> modules;
+
+	while (reader.getOffset() < endOffset)
+	{
+		auto dbInfo = reader.read<DBIModuleInfo>();
+		auto modName = reader.readString();
+		auto objName = reader.readString();
+
+		if (dbInfo->stream != -1)
+			modules.push_back(Module(std::move(dbInfo), std::move(modName), std::move(objName)));
+
+		reader.align(4);
+	}
+
+	reader.seek(reader.getOffset()
+				+ header->secConSize
+				+ header->secMapSize
+				+ header->fileInfoSize
+				+ header->srcModuleSize
+				+ header->ecInfoSize);
+	
+	auto debugHeader = reader.read<DBIDebugHeader>();
+
+	// Get the PE headers so that we can offset the functions to their correct
+	// addresses in the actual executable
+	std::vector<IMAGE_SECTION_HEADER> sections;
+	if (debugHeader->sectionHdr != 0xFFFF)
+	{
+		readSectionHeaders(debugHeader->sectionHdr, sections);
+	}
+
+	uint32_t id = 1;
+	UniqueSrcFiles unique;
+	for (auto& mod : modules)
+	{
+		getModuleFiles(mod.info.data, id, unique, mod.srcIndex);
+	}
+
+	// Start printing the module files in a separate thread
+	Concurrency::task_group tg;
+	tg.run(
+		[this, &unique, &modules, of, fileMod]()
+		{
+			NameStream names;
+			loadNameStream(names);
+
+			auto end = names.map.end();
+
+			for (auto& mod : modules)
+			{
+				for (auto& kv : mod.srcIndex)
+				{
+					auto& us = unique.at(kv.second);
+					
+					if (!us.visited)
+					{
+						auto iter = names.map.find(kv.second);
+
+						// Handle bad file references...again...thank you microsoft
+						if (iter != end)
+						{
+							if (fileMod)
+							{
+								const char* str = iter->second.data;
+								fprintf(of, "FILE %d %s\n", us.id, (*fileMod)(str, strlen(str)));
+							}
+							else
+								fprintf(of, "FILE %d %s\n", us.id, iter->second.data);
+						}
+
+						us.visited = 1;
+					}
+				}
+			}
+		});
+
+	TypeMap tm;
+	tg.run(
+		[this, &tm]
+		{
+			tm = loadTypeStream();
+		});
+
+	// Check to see if we need to remap functions
+	if (debugHeader->tokenRidMap != 0 && debugHeader->tokenRidMap != 0xffff)
+		throw std::exception("Implement me...");
+	
+	Functions functions;
+	for (auto& mod : modules)
+	{
+		getModuleFunctions(mod.info.data, functions);
+	}
+
+	// Get any function from the global symbol stream
+	//getGlobalFunctions(header->symRecordStream, functions);
+
+	//std::sort(functions.begin(), functions.end());
+	Concurrency::parallel_sort(functions.begin(), functions.end());
+
+	for (auto& mod : modules)
+	{
+		resolveFunctionLines(mod.info.data, functions, unique, mod.srcIndex);
+	}
+
+	// We cheat in the Function < operator so that we can sort
+	// first, now iterate over the functions and remove the functions that are duplicates,
+	// we don't actually remove the functions, just make it so that they are skipped from printing
+	FunctionRecord* current = &functions[0];
+	for (uint32_t i = 1, end = (uint32_t)functions.size(); i < end; ++i)
+	{
+		if (*current == functions[i])
+		{
+			// Duplicate! Preserve whichever one is 'most' interesting
+			if (current->lines.data || !functions[i].lines.data)
+				functions[i].segment = 0xffffffff;
+			else if (functions[i].lines.data)
+			{
+				current->segment = 0xffffffff;
+				current = &functions[i];
+			}
+		}
+		else
+			current = &functions[i];
+	}
+	
+	// Wait for the type stream to be loaded, and all of the src files to be written
+	tg.wait();
+
+	printFunctions(functions, sections, tm, of);
+
+	fflush(of);
+}
+
+void
+PDBParser::readModule(const DBIModuleInfo* module, int32_t section, ModuleReadCB cb)
+{
+	const StreamPair& pair = getStream(module->stream);
+
+	StreamReader reader(pair, *this);
+	auto sig = reader.read<int32_t>();
+
+	if (*sig.data != 4)
+		throw std::exception("Invalid module stream signature");
+
+	// Skip functions
+	reader.seek(module->cbSyms + module->cbOldLines);
+	uint32_t endOffset = reader.getOffset() + module->cbLines;
+
+	struct SubsectionHeader
+	{
+		int32_t sig;
+		int32_t size;
+	};
+
+	while (reader.getOffset() < endOffset)
+	{
+		auto header = reader.read<SubsectionHeader>();
+
+		if (header->sig == 0 || (header->sig & Subsection::Ignore))
+			continue;
+
+		uint32_t end = reader.getOffset() + header->size;
+		
+		if (header->sig == section)
+			cb(reader, header->sig, end);
+
+		reader.seek(end);
+
+		// AGH! It seems that regular windows compilers properly pad this, the Xenon compiler,
+		// however, just says FUCK YOU
+		reader.align(4);
+	}
+}
+
+void
+PDBParser::printHeader(const DBIHeader* header, FILE* of, const char* platform)
+{
+	if (!platform)
+	{
+		const char* machineType = nullptr;
+		switch (header->machine)
+		{
+		case IMAGE_FILE_MACHINE_I386:
+			machineType = "x86";
+			break;
+		case IMAGE_FILE_MACHINE_AMD64:
+			machineType = "x86_64";
+			break;
+		case IMAGE_FILE_MACHINE_ARM:
+			machineType = "arm";
+			break;
+		case 0x01F2: // This is the value that the Xenon uses, which isn't in the IMAGE_FILE_MACHINE list, which is awesome
+			machineType = "ppc64";
+			break;
+		default:
+			machineType = "unknown";
+			break;
+		}
+
+		fprintf(of, "MODULE windows %s %08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X%x %spdb\n", machineType,
+			m_guid.Data1, m_guid.Data2, m_guid.Data3,
+			m_guid.Data4[0], m_guid.Data4[1], m_guid.Data4[2], m_guid.Data4[3],
+			m_guid.Data4[4], m_guid.Data4[5], m_guid.Data4[6], m_guid.Data4[7],
+			header->age, m_filename.c_str());
+	}
+	else
+		fprintf(of, "MODULE %s %08X%04X%04X%02X%02X%02X%02X%02X%02X%02X%02X%x %spdb\n", platform,
+			m_guid.Data1, m_guid.Data2, m_guid.Data3,
+			m_guid.Data4[0], m_guid.Data4[1], m_guid.Data4[2], m_guid.Data4[3],
+			m_guid.Data4[4], m_guid.Data4[5], m_guid.Data4[6], m_guid.Data4[7],
+			header->age, m_filename.c_str());
+	
+
+	fprintf(of, "INFO CODE_ID %08X%X %s%s\n", m_PETimeStamp, m_PESize, m_filename.c_str(), m_isExe ? "exe" : "dll");
+}
+
+void
+PDBParser::readSectionHeaders(uint32_t headerStream, SectionHeaders& headers)
+{
+	auto& hs = getStream(headerStream);
+
+	StreamReader reader(hs, *this);
+
+	while (reader.getOffset() < hs.size)
+	{
+		auto sh = reader.read<SectionHeader>();
+		headers.push_back(*sh.data);
+	}
+}
+
+void
+PDBParser::getModuleFiles(const DBIModuleInfo* module, uint32_t& id, UniqueSrcFiles& unique, SrcFileIndex& fileIndices)
+{
+	readModule(module, Subsection::FileChecksums,
+		[module, &id, &unique, &fileIndices](StreamReader& reader, int32_t sig, uint32_t end)
+		{
+			uint32_t index = reader.getOffset();
+			
+			while (reader.getOffset() < end)
+			{
+				uint32_t msid = reader.getOffset() - index;
+				auto fileChk = reader.read<CVFileChecksum>();
+
+				auto fiter = unique.find(fileChk->name);
+				if (fiter == unique.end())
+				{
+					auto& fileid = unique[fileChk->name];
+					fileid.id = id++;
+				}
+				else
+					id++;
+
+				fileIndices.insert(std::make_pair(msid, fileChk->name));
+
+				// Skip past the actual checksum itself
+				reader.seek(reader.getOffset() + fileChk->len);
+				reader.align(4);
+			}
+		});
+}
+
+void
+PDBParser::getModuleFunctions(const DBIModuleInfo* module, Functions& funcs)
+{
+	const StreamPair& pair = getStream(module->stream);
+
+	StreamReader reader(pair, *this);
+	auto sig = reader.read<int32_t>();
+
+	if (*sig.data != 4)
+		throw std::exception("Invalid module stream signature");
+
+	struct SymbolHeader
+	{
+		uint16_t size;
+		uint16_t type;
+	};
+
+	uint32_t end = (uint32_t)module->cbSyms;
+
+	while (reader.getOffset() < end)
+	{
+		auto header = reader.read<SymbolHeader>();
+
+		uint32_t offsetBeg = reader.getOffset() - sizeof(uint16_t);
+
+		switch (header->type)
+		{
+		case SymbolDefs::S_GPROC32:
+		case SymbolDefs::S_LPROC32:
+			{
+				auto proc = reader.read<ProcSym32>();
+				auto name = reader.readString();
+
+				FunctionRecord rec(std::move(name));
+				rec.offset = proc->off;
+				rec.segment = proc->seg;
+				rec.length = proc->len;
+				rec.typeIndex = proc->typind;
+
+				funcs.push_back(std::move(rec));
+			}
+			break;
+		case SymbolDefs::S_THUNK32:
+			{
+				auto thunk = reader.read<ThunkSym32>();
+				auto name = reader.readString();
+
+				FunctionRecord rec(std::move(name));
+				rec.offset = thunk->off;
+				rec.segment = thunk->seg;
+				rec.length = thunk->parent != 0 ? thunk->len : 0;
+
+				funcs.push_back(std::move(rec));
+			}
+			break;
+		default:
+			break;
+		}
+
+		// Mycket viktigt!
+		reader.seek(offsetBeg + header->size);
+	}
+}
+
+void
+PDBParser::getGlobalFunctions(uint16_t symRecStream, Functions& funcs)
+{
+	const StreamPair& pair = getStream(symRecStream);
+	StreamReader reader(pair, *this);
+
+	struct Record
+	{
+		uint16_t leafType;
+		uint32_t symType;
+		uint32_t offset;
+		uint16_t segment;
+	};
+
+	while (reader.getOffset() < pair.size)
+	{
+		auto rec = reader.read<Record>();
+		auto name = reader.readString();
+
+		// Is function?
+		if (rec->symType == 2)
+		{
+			FunctionRecord frec(std::move(name));
+			frec.offset = rec->offset;
+			frec.segment = rec->segment;
+			frec.length = 0;
+
+			funcs.push_back(std::move(frec));
+		}
+
+	}
+}
+
+void
+PDBParser::resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, const UniqueSrcFiles& unique, const SrcFileIndex& fileIndex)
+{
+	readModule(module, Subsection::Lines,
+		[&funcs, &unique, &fileIndex](StreamReader& reader, int32_t sig, uint32_t end)
+		{
+			auto ls = reader.read<CV_LineSection>();
+			
+			size_t min = 0;
+			size_t max = funcs.size() - 1;
+			while (min < max)
+			{
+				size_t mid = (min + max) >> 1;
+
+				auto& func = funcs[mid];
+				if (func.segment < ls->sec || (func.segment == ls->sec && func.offset < ls->off))
+					min = mid + 1;
+				else
+					max = mid;
+			}
+
+			auto& function = funcs[min];
+			if (function.lineOffset != 0 && function.lineOffset - function.offset < ls->off - function.offset
+				|| function.lineCount & 0xF0000000) // This means the first function always wins, which seems to be the behavior of the original Breakpad implementation
+				return;
+
+			auto srcfile = reader.read<CV_SourceFile>();
+
+			// First find the module specific file offset
+			uint32_t fileChk = fileIndex.at(srcfile->index);
+
+			// Next get the unique id that is paired with that particular file
+			function.fileIndex = unique.at(fileChk).id;
+
+			function.lineCount = srcfile->count;
+			function.lineOffset = ls->off;
+				
+			if (function.lineCount)
+				function.lines = reader.read<uint8_t>(srcfile->count * sizeof(CV_Line));
+			
+			// Mark that the function has been encountered
+			function.lineCount |= 0xF0000000;
+		});
+}
+
+void
+PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const TypeMap& tm, FILE* of)
+{
+	std::string str;
+	str.reserve(2048);
+
+	std::string temp;
+	str.reserve(1024);
+
+	for (auto& func : funcs)
+	{
+		str.clear();
+
+		if (func.segment == 0xffffffff)
+			continue;
+
+		uint32_t offset = func.offset + headers[func.segment - 1].VirtualAddress;
+
+		if (func.typeIndex)
+		{
+			stringizeType(func.typeIndex, str, tm, IsTopLevel);
+			
+			temp.assign(func.name.data);
+			std::string::size_type pos;
+			while ((pos = temp.rfind(" __ptr64")) != std::string::npos)
+			{
+				temp.erase(pos, 8);
+			}
+
+			while ((pos = temp.rfind("__cdecl")) != std::string::npos)
+			{
+				temp.erase(pos, 7);
+			}
+
+			fprintf(of, "FUNC %x %x 0 %s%s\n", offset, func.length, temp.c_str(), str.c_str());
+
+			uint32_t lineCount = func.lineCount & 0x0FFFFFFF;
+			if (lineCount)
+			{
+				const CV_Line* lines = (const CV_Line*)func.lines.data;
+				uint32_t fromNext = lineCount - 1;
+				for (uint32_t i = 0; i < lineCount; ++i)
+				{
+					uint32_t size = i < fromNext ? lines[i + 1].offset - lines[i].offset : func.length - lines[i].offset;
+					fprintf(of, "%x %x %u %u\n", lines[i].offset + offset, size, lines[i].flags & CV_Line_Flags::linenumStart, func.fileIndex);
+				}
+			}
+		}
+		else if (func.length)
+		{
+			fprintf(of, "FUNC %x %x 0 %s\n", offset, func.length, func.name.data);
+		}
+		else
+		{
+			fprintf(of, "PUBLIC %x 0 %s\n", offset, func.name.data);
+		}
+	}
+}
+
+bool
+PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, uint32_t flags)
+{
+	if (type == 0)
+	{
+		output.append("...", 3);
+		return false;
+	}
+
+	auto ti = tm.find(type);
+	if (ti == tm.end())
+	{
+		switch (type & 0xff)
+		{
+		case TYPE_ENUM::T_VOID:
+			output.append("void", 4);
+			break;
+			// These ones don't follow the pattern
+		case TYPE_ENUM::T_PVOID:
+		case TYPE_ENUM::T_PFVOID:
+		case TYPE_ENUM::T_PHVOID:
+			output.append("void*", 5);
+			break;
+		case TYPE_ENUM::T_HRESULT: // Thanks Microsoft!
+			output.append("HRESULT", 7);
+			break;
+		case TYPE_ENUM::T_INT1:
+		case TYPE_ENUM::T_CHAR:
+		case TYPE_ENUM::T_RCHAR: // I have no idea what a "really char" is
+			output.append("s8", 2);
+			break;
+		case TYPE_ENUM::T_UINT1:
+		case TYPE_ENUM::T_UCHAR:
+			output.append("u8", 2);
+			break;
+		case TYPE_ENUM::T_WCHAR:
+			output.append("wchar_t", 6);
+			break;
+		case TYPE_ENUM::T_SHORT:
+		case TYPE_ENUM::T_INT2:
+			output.append("s16", 3);
+			break;
+		case TYPE_ENUM::T_USHORT:
+		case TYPE_ENUM::T_UINT2:
+			output.append("u16", 3);
+			break;
+		case TYPE_ENUM::T_LONG:
+		case TYPE_ENUM::T_INT4:
+			output.append("s32", 3);
+			break;
+		case TYPE_ENUM::T_ULONG:
+		case TYPE_ENUM::T_UINT4:
+			output.append("u32", 3);
+			break;
+		case TYPE_ENUM::T_QUAD:
+		case TYPE_ENUM::T_INT8:
+			output.append("s64", 3);
+			break;
+		case TYPE_ENUM::T_UQUAD:
+		case TYPE_ENUM::T_UINT8:
+			output.append("u64", 3);
+			break;
+		case TYPE_ENUM::T_OCT:
+		case TYPE_ENUM::T_INT16:
+			output.append("s128", 4);
+			break;
+		case TYPE_ENUM::T_UOCT:
+		case TYPE_ENUM::T_UINT16:
+			output.append("u128", 4);
+			break;
+		case TYPE_ENUM::T_REAL32:
+			output.append("f32", 3);
+			break;
+		case TYPE_ENUM::T_REAL64:
+			output.append("f64", 3);
+			break;
+		case TYPE_ENUM::T_REAL80:
+			output.append("f80", 3);
+			break;
+		case TYPE_ENUM::T_REAL128:
+			output.append("f128", 4);
+			break;
+		case TYPE_ENUM::T_BOOL08:
+		case TYPE_ENUM::T_BOOL16:
+		case TYPE_ENUM::T_BOOL32:
+		case TYPE_ENUM::T_BOOL64:
+			output.append("bool", 4);
+			break;
+		default:
+			output.append("!Unknown!", 9);
+			return false;
+		}
+		
+		// Check to see if it is a pointer type, thankfully the enum values are consistent
+		if (type & (0x0600 | 0x0400))
+			output.append("*", 1);
+
+		return false;
+	}
+
+	const uint8_t* data = ti->second.data.data;
+
+	switch (ti->second.type)
+	{
+		// const/volatile/unaligned
+	case LEAF::LF_MODIFIER:
+		{
+			const LeafModifier* lm = (const LeafModifier*)data;
+			stringizeType(lm->type, output, tm, 0);
+
+			if (flags & (IsUnderlying | ~IsTopLevel))
+				return false;
+
+			switch (lm->attr)
+			{
+			case CV_modifier::MOD_const:
+				output.append(" const", 6);
+				break;
+			case CV_modifier::MOD_volatile:
+				output.append(" volatile", 9);
+				break;
+			case CV_modifier::MOD_unaligned:
+				output.append(" unaligned", 10);
+				break;
+			}
+		}
+		break;
+		// The argument list for a function definition
+	case LEAF::LF_ARGLIST:
+		{
+			const LeafArgList* lal = (const LeafArgList*)data;
+			output.append("(", 1);
+
+			if (lal->count == 0 && (flags & ~IsTopLevel))
+			{
+				output.append("void)", 5);
+				return false;
+			}
+
+			const uint32_t* type = (const uint32_t*)lal;
+			for (uint32_t i = 0; i < lal->count; ++i)
+			{
+				stringizeType(*++type, output, tm, flags);
+
+				if (i != lal->count - 1)
+					output.append(", ", 2);
+			}
+
+			output.append(")", 1);
+		}
+		break;
+		// A pointer, with an underlying type
+	case LEAF::LF_POINTER:
+		{
+			const LeafPointer* lp = (const LeafPointer*)data;
+
+			if (!stringizeType(lp->utype, output, tm, IsUnderlying & flags))
+			{
+				switch ((lp->attr & LeafPointerAttr::ptrmode) >> 5)
+				{
+				case CV_ptrmode::CV_PTR_MODE_REF:
+					output.append("&", 1);
+					break;
+				case CV_ptrmode::CV_PTR_MODE_PTR:
+					output.append("*", 1);
+					break;
+				case CV_ptrmode::CV_PTR_MODE_PMEM:
+					output.append("::*", 3);
+					break;
+				case CV_ptrmode::CV_PTR_MODE_PMFUNC:
+					output.append("::", 2);
+					break;
+				case CV_ptrmode::CV_PTR_MODE_RESERVED: // This is now being used for r-value references
+					output.append("&&", 2);
+					break;
+				default:
+					fprintf(stderr, "Unknown ptr type encountered\n");
+					break;
+				}
+			}
+			
+			if (lp->attr & LeafPointerAttr::isconst)
+				output.append(" const", 6);
+
+			if (lp->attr & LeafPointerAttr::isvolatile)
+				output.append(" volatile", 9);
+
+			// restrict could be added, but not necessarily interesting?
+		}
+		break;
+	case LEAF::LF_ARRAY:
+		{
+			const LeafArray* la = (const LeafArray*)data;
+
+			stringizeType(la->elemtype, output, tm, 0);
+
+			output.append("[", 1);
+			// According to the comments, if this value is less than 0x8000 then the next 2 bytes are the actual value
+			if (la->idxtype < 0x8000)
+				output += std::to_string(*((uint16_t*)(data + sizeof(LeafArray))));
+			else
+				stringizeType(la->idxtype, output, tm, 0);
+			output.append("]", 1);
+		}
+		break;
+	case LEAF::LF_MFUNCTION:
+		{
+			const LeafMFunc* lmf = (const LeafMFunc*)data;
+
+			if (flags & IsUnderlying)
+			{
+				stringizeType(lmf->rvtype, output, tm, 0);
+				output.append(" (", 2);
+				stringizeType(lmf->classtype, output, tm, 0);
+				output.append("::*)", 4);
+			}
+
+			stringizeType(lmf->arglist, output, tm, 0);
+		}
+		return true;
+	case LEAF::LF_PROCEDURE:
+		{
+			const LeafProc* proc = (const LeafProc*)data;
+
+			if (flags & IsUnderlying)
+			{
+				stringizeType(proc->rvtype, output, tm, 0);
+				output.append(" (*)", 4);
+			}
+
+			stringizeType(proc->arglist, output, tm, 0);
+		}
+		return true;
+	case LEAF::LF_INDEX:
+		{
+			const LeafIndex* li = (const LeafIndex*)data;
+			stringizeType(li->index, output, tm, flags);
+		}
+		break;
+		// All types past this point are leaf types that terminate recursion
+	case LEAF::LF_ENUM:
+	case LEAF::LF_ALIAS:
+	case LEAF::LF_UNION:
+	case LEAF::LF_CLASS:
+	case LEAF::LF_STRUCTURE:
+		{
+			output += ti->second.name.data;
+		}
+		break;
+	case LEAF::LF_CHAR:
+		{
+			const LeafChar* ch = (const LeafChar*)data;
+			output += ch->val;
+		}
+		break;
+	case LEAF::LF_SHORT:
+		{
+			const LeafShort* sh = (const LeafShort*)data;
+			output += std::to_string(sh->val);
+		}
+		break;
+	case LEAF::LF_USHORT:
+		{
+			const LeafUShort* sh = (const LeafUShort*)data;
+			output += std::to_string(sh->val);
+		}
+		break;
+	case LEAF::LF_LONG:
+		{
+			const LeafLong* ll = (const LeafLong*)data;
+			output += std::to_string(ll->val);
+		}
+		break;
+	case LEAF::LF_ULONG:
+		{
+			const LeafULong* ll = (const LeafULong*)data;
+			output += std::to_string(ll->val);
+		}
+		break;
+	case LEAF::LF_REAL32:
+		{
+			const LeafReal32* ll = (const LeafReal32*)data;
+			output += std::to_string(ll->val);
+		}
+		break;
+	case LEAF::LF_REAL64:
+		{
+			const LeafReal64* ll = (const LeafReal64*)data;
+			output += std::to_string(ll->val);
+		}
+		break;
+	case LEAF::LF_REAL80:
+		output.append("f80");
+		break;
+	case LEAF::LF_REAL128:
+		output.append("f128");
+		break;
+	case LEAF::LF_QUADWORD:
+		{
+			const LeafQuad* ll = (const LeafQuad*)data;
+			output += std::to_string(ll->val);
+		}
+		break;
+	case LEAF::LF_UQUADWORD:
+		{
+			const LeafUQuad* ll = (const LeafUQuad*)data;
+			output += std::to_string(ll->val);
+		}
+		break;
+	default:
+		// Unhandled...these are the only records I encountered, would need to be extended for managed code
+		break;
+	}
+
+	return false;
+}
+
+}
