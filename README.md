@@ -1,0 +1,1 @@
+A reimplementation of the Breakpad Windows dump_syms tool.
