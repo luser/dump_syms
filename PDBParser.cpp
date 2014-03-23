@@ -374,15 +374,12 @@ PDBParser::readRootStream()
 	uint32_t numRootPages = getNumPages(rootSize, m_pageSize);
 	uint32_t numRootIndexPages = getNumPages(numRootPages * 4, m_pageSize);
 
-	// This should hopefully always be the case...
-	if (numRootIndexPages != 1)
-	{
-		fprintf(stderr, "Too many root index pages...\n");
-		return false;	
+	const uint32_t* rootIndices = (const uint32_t*)(m_base + sizeof(PDBHeader));
+	std::vector<uint32_t> rootPageList;
+	for (uint32_t i=0; i < numRootIndexPages; ++i) {
+		const uint32_t* rootPages = (const uint32_t*)(m_base + rootIndices[i] * m_pageSize);
+		rootPageList.insert(rootPageList.end(), rootPages, rootPages + (m_pageSize / sizeof(uint32_t)));
 	}
-
-	uint32_t rootIndex = header->tocPageIndex;
-	const uint32_t* rootPageList = (const uint32_t*)(m_base + rootIndex * m_pageSize);
 
 	uint32_t pageIndex = 0;
 	uint32_t pageOffset = 0;

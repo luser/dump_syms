@@ -37,7 +37,6 @@ namespace google_breakpad
 		int32_t		pagesUsed;
 		int32_t		directorySize;
 		uint32_t	reserved;
-		uint32_t	tocPageIndex;
 	};
 
 	struct NameIndexHeader
