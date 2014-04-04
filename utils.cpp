@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Original author: Jake Shadle <jshadle@dice.se>
+// Original author: Jake Shadle <jake.shadle@frostbite.com>
 
 #include "utils.h"
 #include <windows.h>
