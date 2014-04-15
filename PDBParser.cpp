@@ -18,7 +18,7 @@
 // OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 // SOFTWARE.
 
-// Original author: Jake Shadle <jshadle@dice.se>
+// Original author: Jake Shadle <jake.shadle@frostbite.com>
 
 #include "PDBParser.h"
 
@@ -667,9 +667,9 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		DataPtr<char>			objectName;
 
 		Module(DataPtr<DBIModuleInfo>&& data, DataPtr<char>&& modName, DataPtr<char>&& objName)
-			: info(data)
-			, moduleName(modName)
-			, objectName(objName)
+			: info(std::move(data))
+			, moduleName(std::move(modName))
+			, objectName(std::move(objName))
 		{}
 
 		Module(Module&& other)
