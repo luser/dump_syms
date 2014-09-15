@@ -273,10 +273,10 @@ private:
 	void getGlobalFunctions(uint16_t symRecStream, Functions& funcs);
 	void resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, const UniqueSrcFiles& unique, const SrcFileIndex& fileIndex);
 	void printFunctions(Functions& funcs, const SectionHeaders& headers, const TypeMap& tm, FILE* of);
-	void readAndPrintFPOv1(uint32_t fpoStream, FILE* of);
-	void printFPOv1(const FPO_DATA& data, FILE* of);
-	void readAndPrintFPOv2(uint32_t fpoStream, const NameStream& names, FILE* of);
-	void printFPOv2(const FPO_DATA_V2& data, const NameStream& names, FILE* of);
+	template<typename T>
+	void readAndPrintFPO(uint32_t fpoStream, const NameStream& names, FILE* of);
+	void printFPO(const FPO_DATA& data, const NameStream& names, FILE* of);
+	void printFPO(const FPO_DATA_V2& data, const NameStream& names, FILE* of);
 
 	std::vector<StreamPair>			m_streams;
 	std::map<std::string, int32_t>	m_nameIndices;

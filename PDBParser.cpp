@@ -825,11 +825,11 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 
 	//TODO: read old-style FPO records as well
 	if (debugHeader->newFPO != 0xffff) {
-		readAndPrintFPOv2(debugHeader->newFPO, names, of);
+		readAndPrintFPO<FPO_DATA_V2>(debugHeader->newFPO, names, of);
 	}
 
 	if (debugHeader->FPO != 0xffff) {
-		readAndPrintFPOv1(debugHeader->FPO, of);
+		readAndPrintFPO<FPO_DATA>(debugHeader->FPO, names, of);
 	}
 
 	fflush(of);
@@ -1164,51 +1164,35 @@ PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const
 	}
 }
 
+template<typename T>
 void
-PDBParser::readAndPrintFPOv1(uint32_t fpoStream, FILE* of)
+PDBParser::readAndPrintFPO(uint32_t fpoStream, const NameStream& names, FILE* of)
 {
 	auto& fs = getStream(fpoStream);
 
 	StreamReader reader(fs, *this);
 
-	FPO_DATA last = {};
+	T last = {};
 	while (reader.getOffset() < fs.size)
 	{
-		auto fh = reader.read<FPO_DATA>();
+		auto fh = reader.read<T>();
 		// PDB files contain lots of duplicated FPO records.
 		if (fh.data->ulOffStart != last.ulOffStart || fh.data->cbProcSize != last.cbProcSize || fh.data->cbProlog != last.cbProlog)
-			printFPOv1(*fh.data, of);
+			printFPO(*fh.data, names, of);
 		last = *fh.data;
 	}
 }
 
 void
-PDBParser::printFPOv1(const FPO_DATA& data, FILE* of)
+PDBParser::printFPO(const FPO_DATA& data, const NameStream& names, FILE* of)
 {
+	(void)names;
 	fprintf(of, "STACK WIN 0 %x %x %x %x %x %x %x %x 0 %d\n",
 	data.ulOffStart, data.cbProcSize, data.cbProlog, 0, data.cdwParams, data.cbRegs, data.cdwLocals, 0, data.fUseBP);
 }
 
 void
-PDBParser::readAndPrintFPOv2(uint32_t fpoStream, const NameStream& names, FILE* of)
-{
-	auto& fs = getStream(fpoStream);
-
-	StreamReader reader(fs, *this);
-
-	FPO_DATA_V2 last = {};
-	while (reader.getOffset() < fs.size)
-	{
-		auto fh = reader.read<FPO_DATA_V2>();
-		// PDB files contain lots of duplicated FPO records.
-		if (fh.data->ulOffStart != last.ulOffStart || fh.data->cbProcSize != last.cbProcSize || fh.data->cbProlog != last.cbProlog)
-			printFPOv2(*fh.data, names, of);
-		last = *fh.data;
-	}
-}
-
-void
-PDBParser::printFPOv2(const FPO_DATA_V2& data, const NameStream& names, FILE* of)
+PDBParser::printFPO(const FPO_DATA_V2& data, const NameStream& names, FILE* of)
 {
 	fprintf(of, "STACK WIN 4 %x %x %x %x %x %x %x %x 1 ",
 		data.ulOffStart, data.cbProcSize, data.cbProlog, 0, data.cbParams, data.cbSavedRegs, data.cbLocals, data.maxStack);
