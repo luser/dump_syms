@@ -1793,5 +1793,25 @@ namespace google_breakpad
 		uint16_t start;
 		uint16_t end;
 	};
+
+	enum class FPOFlags : uint32_t
+	{
+		SEH = 1,
+		CPPEH = 2,
+		fnStart = 4
+	};
+
+	struct FPO_DATA_V2
+	{
+		uint32_t ulOffStart;
+		uint32_t cbProcSize;
+		uint32_t cbLocals;
+		uint32_t cbParams;
+		uint32_t maxStack;
+		uint32_t ProgramStringOffset;
+		uint16_t cbProlog;
+		uint16_t cbSavedRegs;
+		FPOFlags flags;
+	};
 #pragma pack(pop)
 }

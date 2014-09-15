@@ -731,14 +731,14 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		getModuleFiles(mod.info.data, id, unique, mod.srcIndex);
 	}
 
+	NameStream names;
+	loadNameStream(names);
+
 	// Start printing the module files in a separate thread
 	Concurrency::task_group tg;
 	tg.run(
-		[this, &unique, &modules, of, fileMod]()
+		[this, &unique, &modules, &names, of, fileMod]()
 		{
-			NameStream names;
-			loadNameStream(names);
-
 			auto end = names.map.end();
 
 			for (auto& mod : modules)
@@ -822,6 +822,11 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 	tg.wait();
 
 	printFunctions(functions, sections, tm, of);
+
+	//TODO: read old-style FPO records as well
+	if (debugHeader->newFPO != 0xffff) {
+		readAndPrintFPOv2(debugHeader->newFPO, names, of);
+	}
 
 	fflush(of);
 }
@@ -1153,6 +1158,37 @@ PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const
 			fprintf(of, "PUBLIC %x 0 %s\n", offset, func.name.data);
 		}
 	}
+}
+
+void
+PDBParser::readAndPrintFPOv2(uint32_t fpoStream, const NameStream& names, FILE* of)
+{
+	auto& fs = getStream(fpoStream);
+
+	StreamReader reader(fs, *this);
+
+	FPO_DATA_V2 last = {};
+	while (reader.getOffset() < fs.size)
+	{
+		auto fh = reader.read<FPO_DATA_V2>();
+		// PDB files contain lots of duplicated FPO records.
+		if (fh.data->ulOffStart != last.ulOffStart || fh.data->cbProcSize != last.cbProcSize || fh.data->cbProlog != last.cbProlog)
+			printFPOv2(*fh.data, names, of);
+		last = *fh.data;
+	}
+}
+
+void
+PDBParser::printFPOv2(const FPO_DATA_V2& data, const NameStream& names, FILE* of)
+{
+	fprintf(of, "STACK WIN 4 %x %x %x %x %x %x %x %x 1 ",
+		data.ulOffStart, data.cbProcSize, data.cbProlog, 0, data.cbParams, data.cbSavedRegs, data.cbLocals, data.maxStack);
+	auto iter = names.map.find(data.ProgramStringOffset);
+	if (iter != names.map.end())
+	{
+		fprintf(of, "%s", iter->second.data);
+	}
+	fprintf(of, "\n");
 }
 
 bool
