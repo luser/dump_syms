@@ -828,6 +828,10 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		readAndPrintFPOv2(debugHeader->newFPO, names, of);
 	}
 
+	if (debugHeader->FPO != 0xffff) {
+		readAndPrintFPOv1(debugHeader->FPO, of);
+	}
+
 	fflush(of);
 }
 
@@ -1158,6 +1162,31 @@ PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const
 			fprintf(of, "PUBLIC %x 0 %s\n", offset, func.name.data);
 		}
 	}
+}
+
+void
+PDBParser::readAndPrintFPOv1(uint32_t fpoStream, FILE* of)
+{
+	auto& fs = getStream(fpoStream);
+
+	StreamReader reader(fs, *this);
+
+	FPO_DATA last = {};
+	while (reader.getOffset() < fs.size)
+	{
+		auto fh = reader.read<FPO_DATA>();
+		// PDB files contain lots of duplicated FPO records.
+		if (fh.data->ulOffStart != last.ulOffStart || fh.data->cbProcSize != last.cbProcSize || fh.data->cbProlog != last.cbProlog)
+			printFPOv1(*fh.data, of);
+		last = *fh.data;
+	}
+}
+
+void
+PDBParser::printFPOv1(const FPO_DATA& data, FILE* of)
+{
+	fprintf(of, "STACK WIN 0 %x %x %x %x %x %x %x %x 0 %d\n",
+	data.ulOffStart, data.cbProcSize, data.cbProlog, 0, data.cdwParams, data.cbRegs, data.cdwLocals, 0, data.fUseBP);
 }
 
 void
