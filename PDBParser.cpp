@@ -1134,6 +1134,7 @@ PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const
 				temp.erase(pos, 7);
 			}
 
+			//TODO: get stack param size ala https://code.google.com/p/google-breakpad/source/browse/trunk/src/common/windows/pdb_source_line_writer.cc#1007
 			fprintf(of, "FUNC %x %x 0 %s%s\n", offset, func.length, temp.c_str(), str.c_str());
 
 			uint32_t lineCount = func.lineCount & 0x0FFFFFFF;
@@ -1220,46 +1221,52 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 		case TYPE_ENUM::T_PVOID:
 		case TYPE_ENUM::T_PFVOID:
 		case TYPE_ENUM::T_PHVOID:
-			output.append("void*", 5);
+			output.append("void *", 5);
 			break;
 		case TYPE_ENUM::T_HRESULT: // Thanks Microsoft!
-			output.append("HRESULT", 7);
+			output.append("long", 4);
 			break;
 		case TYPE_ENUM::T_INT1:
 		case TYPE_ENUM::T_CHAR:
+			output.append("signed char", 11);
+			break;
 		case TYPE_ENUM::T_RCHAR: // I have no idea what a "really char" is
-			output.append("s8", 2);
+			output.append("char", 4);
 			break;
 		case TYPE_ENUM::T_UINT1:
 		case TYPE_ENUM::T_UCHAR:
-			output.append("u8", 2);
+			output.append("unsigned char", 13);
 			break;
 		case TYPE_ENUM::T_WCHAR:
-			output.append("wchar_t", 6);
+			output.append("wchar_t", 7);
 			break;
 		case TYPE_ENUM::T_SHORT:
 		case TYPE_ENUM::T_INT2:
-			output.append("s16", 3);
+			output.append("short", 5);
 			break;
 		case TYPE_ENUM::T_USHORT:
 		case TYPE_ENUM::T_UINT2:
-			output.append("u16", 3);
+			output.append("unsigned short", 14);
 			break;
 		case TYPE_ENUM::T_LONG:
+			output.append("long", 4);
+			break;
 		case TYPE_ENUM::T_INT4:
-			output.append("s32", 3);
+			output.append("int", 3);
 			break;
 		case TYPE_ENUM::T_ULONG:
+			output.append("unsigned long", 13);
+			break;
 		case TYPE_ENUM::T_UINT4:
-			output.append("u32", 3);
+			output.append("unsigned int", 12);
 			break;
 		case TYPE_ENUM::T_QUAD:
 		case TYPE_ENUM::T_INT8:
-			output.append("s64", 3);
+			output.append("__int64", 7);
 			break;
 		case TYPE_ENUM::T_UQUAD:
 		case TYPE_ENUM::T_UINT8:
-			output.append("u64", 3);
+			output.append("unsigned __int64", 16);
 			break;
 		case TYPE_ENUM::T_OCT:
 		case TYPE_ENUM::T_INT16:
@@ -1270,13 +1277,14 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 			output.append("u128", 4);
 			break;
 		case TYPE_ENUM::T_REAL32:
-			output.append("f32", 3);
+			output.append("float", 5);
 			break;
 		case TYPE_ENUM::T_REAL64:
-			output.append("f64", 3);
+			output.append("double", 6);
 			break;
 		case TYPE_ENUM::T_REAL80:
-			output.append("f80", 3);
+			// I don't think this actually exists anymore.
+			output.append("long double", 11);
 			break;
 		case TYPE_ENUM::T_REAL128:
 			output.append("f128", 4);
@@ -1294,7 +1302,7 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 		
 		// Check to see if it is a pointer type, thankfully the enum values are consistent
 		if (type & (0x0600 | 0x0400))
-			output.append("*", 1);
+			output.append(" *", 2);
 
 		return false;
 	}
@@ -1334,7 +1342,7 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 
 			if (lal->count == 0 && (flags & ~IsTopLevel))
 			{
-				output.append("void)", 5);
+				output.append(")", 1);
 				return false;
 			}
 
@@ -1344,7 +1352,7 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 				stringizeType(*++type, output, tm, flags);
 
 				if (i != lal->count - 1)
-					output.append(", ", 2);
+					output.append(",", 1);
 			}
 
 			output.append(")", 1);
@@ -1360,10 +1368,10 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 				switch ((lp->attr & LeafPointerAttr::ptrmode) >> 5)
 				{
 				case CV_ptrmode::CV_PTR_MODE_REF:
-					output.append("&", 1);
+					output.append(" &", 2);
 					break;
 				case CV_ptrmode::CV_PTR_MODE_PTR:
-					output.append("*", 1);
+					output.append(" *", 2);
 					break;
 				case CV_ptrmode::CV_PTR_MODE_PMEM:
 					output.append("::*", 3);
