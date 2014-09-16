@@ -786,10 +786,6 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		getModuleFunctions(mod.info.data, functions);
 	}
 
-	// Get any function from the global symbol stream
-	//getGlobalFunctions(header->symRecordStream, functions);
-
-	//std::sort(functions.begin(), functions.end());
 	Concurrency::parallel_sort(functions.begin(), functions.end());
 
 	for (auto& mod : modules)
@@ -823,7 +819,6 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 
 	printFunctions(functions, sections, tm, of);
 
-	//TODO: read old-style FPO records as well
 	if (debugHeader->newFPO != 0xffff) {
 		readAndPrintFPO<FPO_DATA_V2>(debugHeader->newFPO, names, of);
 	}
