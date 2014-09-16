@@ -634,14 +634,6 @@ PDBParser::close()
 	CloseHandle(m_mapFile);
 }
 
-struct global
-{
-	uint16_t leafType;
-	uint32_t symType;
-	uint32_t offset;
-	uint16_t segment;
-};
-
 struct SymbolSource
 {
 	uint16_t numModules;
@@ -781,6 +773,10 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 	if (debugHeader->tokenRidMap != 0 && debugHeader->tokenRidMap != 0xffff)
 		throw std::exception("Implement me...");
 	
+	// Get functions from the global stream. These have mangled names that are useful.
+	Globals globals;
+	getGlobalFunctions(header->symRecordStream, sections, globals);
+
 	Functions functions;
 	for (auto& mod : modules)
 	{
@@ -834,7 +830,10 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		func.offset += sections[func.segment - 1].VirtualAddress;
 		if (!updateParamSize(func, fpov2Data))
 		{
-			updateParamSize(func, fpov1Data);
+			if (!updateParamSize(func, fpov1Data))
+			{
+				updateParamSize(func, globals);
+			}
 		}
 	}
 	
@@ -1042,35 +1041,22 @@ PDBParser::getModuleFunctions(const DBIModuleInfo* module, Functions& funcs)
 }
 
 void
-PDBParser::getGlobalFunctions(uint16_t symRecStream, Functions& funcs)
+PDBParser::getGlobalFunctions(uint16_t symRecStream, const SectionHeaders& headers, Globals& globals)
 {
 	const StreamPair& pair = getStream(symRecStream);
 	StreamReader reader(pair, *this);
 
-	struct Record
-	{
-		uint16_t leafType;
-		uint32_t symType;
-		uint32_t offset;
-		uint16_t segment;
-	};
-
 	while (reader.getOffset() < pair.size)
 	{
-		auto rec = reader.read<Record>();
-		auto name = reader.readString();
+		auto len = *reader.read<uint16_t>().data;
+		auto rec = reader.read<GlobalRecord>();
+		auto name = reader.read<char>(len - sizeof(GlobalRecord));
 
 		// Is function?
 		if (rec->symType == 2)
 		{
-			FunctionRecord frec(std::move(name));
-			frec.offset = rec->offset;
-			frec.segment = rec->segment;
-			frec.length = 0;
-
-			funcs.push_back(std::move(frec));
+			globals.insert(std::make_pair(rec->offset + headers[rec->segment - 1].VirtualAddress, std::move(name)));
 		}
-
 	}
 }
 
@@ -1138,7 +1124,7 @@ PDBParser::printFunctions(Functions& funcs, const TypeMap& tm, FILE* of)
 		if (func.typeIndex)
 		{
 			stringizeType(func.typeIndex, str, tm, IsTopLevel);
-			
+
 			temp.assign(func.name.data);
 			std::string::size_type pos;
 			while ((pos = temp.rfind(" __ptr64")) != std::string::npos)
@@ -1207,6 +1193,44 @@ PDBParser::updateParamSize(FunctionRecord& func, std::map<std::pair<uint32_t, ui
 	{
 		updateParamSize(func, *it->second.data);
 		return true;
+	}
+	return false;
+}
+
+bool
+PDBParser::updateParamSize(FunctionRecord& func, Globals& globals)
+{
+	auto g = globals.find(func.offset);
+	if (g != globals.end())
+	{
+		const char* name = g->second.data;
+		// stdcall and fastcall functions have their param size embedded in the decorated name
+		if (name[0] == '@' || name[0] == '_')
+		{
+			const char* p = strrchr(name, '@');
+			if (p && p != name)
+			{
+				char* end;
+				long val = strtol(p + 1, &end, 10);
+				if (*end == '\0')
+				{
+					func.paramSize = val;
+					// fastcall functions accept up to 8 bytes of parameters in registers
+					if (name[0] == '@')
+					{
+						if (val > 8)
+						{
+							func.paramSize -= 8;
+						}
+						else
+						{
+							func.paramSize = 0;
+						}
+					}
+					return true;
+				}
+			}
+		}
 	}
 	return false;
 }

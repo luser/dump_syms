@@ -149,7 +149,7 @@ private:
 			, segment(segment)
 		{}
 
-		FunctionRecord(DataPtr<char>&& iname)
+		FunctionRecord(const DataPtr<char>&& iname)
 			: name(std::move(iname))
 			, segment(0)
 			, offset(0)
@@ -241,6 +241,7 @@ private:
 	typedef std::vector<FunctionRecord> Functions;
 	typedef std::unordered_map<uint32_t, TypeInfo> TypeMap;
 	typedef std::vector<SectionHeader> SectionHeaders;
+	typedef std::unordered_map<uint32_t, DataPtr<char>> Globals;
 	// If we decide to only support VC2013 we can use this.
 	//template<typename T>
 	//using FPODataMap = std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>;
@@ -275,13 +276,14 @@ private:
 	void getModuleFiles(const DBIModuleInfo* module, uint32_t& id, UniqueSrcFiles& unique, SrcFileIndex& fileIndex);
 	void printFiles(const SrcFileIndex& fileIndex, FILE* of);
 	void getModuleFunctions(const DBIModuleInfo* module, Functions& funcs);
-	void getGlobalFunctions(uint16_t symRecStream, Functions& funcs);
+	void getGlobalFunctions(uint16_t symRecStream, const SectionHeaders& headers, Globals& globals);
 	void resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, const UniqueSrcFiles& unique, const SrcFileIndex& fileIndex);
 	void printFunctions(Functions& funcs, const TypeMap& tm, FILE* of);
 	template<typename T>
 	void readFPO(uint32_t fpoStream, std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData);
 	template<typename T>
 	bool updateParamSize(FunctionRecord& func, std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData);
+	bool updateParamSize(FunctionRecord& func, Globals& globals);
 	void updateParamSize(FunctionRecord& func, const FPO_DATA& fpoData);
 	void updateParamSize(FunctionRecord& func, const FPO_DATA_V2& fpoData);
 	template<typename T>

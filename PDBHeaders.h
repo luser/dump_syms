@@ -1794,6 +1794,14 @@ namespace google_breakpad
 		uint16_t end;
 	};
 
+	struct GlobalRecord
+	{
+		uint16_t leafType;
+		uint32_t symType;
+		uint32_t offset;
+		uint16_t segment;
+	};
+
 	enum class FPOFlags : uint32_t
 	{
 		SEH = 1,
