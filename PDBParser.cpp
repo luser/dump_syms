@@ -1208,7 +1208,7 @@ PDBParser::updateParamSize(FunctionRecord& func, std::map<std::pair<uint32_t, ui
 		updateParamSize(func, *it->second.data);
 		return true;
 	}
-	return true;
+	return false;
 }
 
 void
