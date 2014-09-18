@@ -142,6 +142,7 @@ private:
 		uint32_t			length;
 		uint32_t			lineOffset;
 		uint32_t			typeIndex;	// If this is non-zero, the function is a procedure, not a thunk (I don't know how to read thunk type info...)
+		uint32_t			paramSize;
 
 		FunctionRecord(uint32_t offset, uint32_t segment)
 			: offset(offset)
@@ -156,6 +157,7 @@ private:
 			, lineCount(0)
 			, lineOffset(0)
 			, fileIndex(0)
+			, paramSize(0)
 		{}
 
 		bool operator <(const FunctionRecord& other) const
@@ -239,6 +241,9 @@ private:
 	typedef std::vector<FunctionRecord> Functions;
 	typedef std::unordered_map<uint32_t, TypeInfo> TypeMap;
 	typedef std::vector<SectionHeader> SectionHeaders;
+	// If we decide to only support VC2013 we can use this.
+	//template<typename T>
+	//using FPODataMap = std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>;
 
 	struct NameStream
 	{
@@ -272,9 +277,15 @@ private:
 	void getModuleFunctions(const DBIModuleInfo* module, Functions& funcs);
 	void getGlobalFunctions(uint16_t symRecStream, Functions& funcs);
 	void resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, const UniqueSrcFiles& unique, const SrcFileIndex& fileIndex);
-	void printFunctions(Functions& funcs, const SectionHeaders& headers, const TypeMap& tm, FILE* of);
+	void printFunctions(Functions& funcs, const TypeMap& tm, FILE* of);
 	template<typename T>
-	void readAndPrintFPO(uint32_t fpoStream, const NameStream& names, FILE* of);
+	void readFPO(uint32_t fpoStream, std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData);
+	template<typename T>
+	bool updateParamSize(FunctionRecord& func, std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData);
+	void updateParamSize(FunctionRecord& func, const FPO_DATA& fpoData);
+	void updateParamSize(FunctionRecord& func, const FPO_DATA_V2& fpoData);
+	template<typename T>
+	void printFPOs(std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData, const NameStream& names, FILE* of);
 	void printFPO(const FPO_DATA& data, const NameStream& names, FILE* of);
 	void printFPO(const FPO_DATA_V2& data, const NameStream& names, FILE* of);
 

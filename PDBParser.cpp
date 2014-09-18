@@ -42,6 +42,7 @@ PDBParser::FunctionRecord& PDBParser::FunctionRecord::operator =(FunctionRecord&
 	std::swap(length, other.length);
 	std::swap(lineOffset, other.lineOffset);
 	std::swap(typeIndex, other.typeIndex);
+	std::swap(paramSize, other.paramSize);
 
 	return *this;
 }
@@ -793,6 +794,17 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		resolveFunctionLines(mod.info.data, functions, unique, mod.srcIndex);
 	}
 
+	std::map<std::pair<uint32_t, uint32_t>, DataPtr<FPO_DATA>> fpov1Data;
+	std::map<std::pair<uint32_t, uint32_t>, DataPtr<FPO_DATA_V2>> fpov2Data;
+
+	if (debugHeader->FPO != 0xffff) {
+		readFPO(debugHeader->FPO, fpov1Data);
+	}
+
+	if (debugHeader->newFPO != 0xffff) {
+		readFPO(debugHeader->newFPO, fpov2Data);
+	}
+
 	// We cheat in the Function < operator so that we can sort
 	// first, now iterate over the functions and remove the functions that are duplicates,
 	// we don't actually remove the functions, just make it so that they are skipped from printing
@@ -813,19 +825,26 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		else
 			current = &functions[i];
 	}
+	// Offset functions by segment address and
+	// try to fill in paramSize from FPO data.
+	for (auto& func : functions)
+	{
+		if (func.segment == 0xffffffff)
+			continue;
+		func.offset += sections[func.segment - 1].VirtualAddress;
+		if (!updateParamSize(func, fpov2Data))
+		{
+			updateParamSize(func, fpov1Data);
+		}
+	}
 	
 	// Wait for the type stream to be loaded, and all of the src files to be written
 	tg.wait();
 
-	printFunctions(functions, sections, tm, of);
+	printFunctions(functions, tm, of);
 
-	if (debugHeader->newFPO != 0xffff) {
-		readAndPrintFPO<FPO_DATA_V2>(debugHeader->newFPO, names, of);
-	}
-
-	if (debugHeader->FPO != 0xffff) {
-		readAndPrintFPO<FPO_DATA>(debugHeader->FPO, names, of);
-	}
+	printFPOs(fpov2Data, names, of);
+	printFPOs(fpov1Data, names, of);
 
 	fflush(of);
 }
@@ -1101,7 +1120,7 @@ PDBParser::resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, c
 }
 
 void
-PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const TypeMap& tm, FILE* of)
+PDBParser::printFunctions(Functions& funcs, const TypeMap& tm, FILE* of)
 {
 	std::string str;
 	str.reserve(2048);
@@ -1115,8 +1134,6 @@ PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const
 
 		if (func.segment == 0xffffffff)
 			continue;
-
-		uint32_t offset = func.offset + headers[func.segment - 1].VirtualAddress;
 
 		if (func.typeIndex)
 		{
@@ -1134,8 +1151,7 @@ PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const
 				temp.erase(pos, 7);
 			}
 
-			//TODO: get stack param size ala https://code.google.com/p/google-breakpad/source/browse/trunk/src/common/windows/pdb_source_line_writer.cc#1007
-			fprintf(of, "FUNC %x %x 0 %s%s\n", offset, func.length, temp.c_str(), str.c_str());
+			fprintf(of, "FUNC %x %x %x %s%s\n", func.offset, func.length, func.paramSize, temp.c_str(), str.c_str());
 
 			uint32_t lineCount = func.lineCount & 0x0FFFFFFF;
 			if (lineCount)
@@ -1145,24 +1161,24 @@ PDBParser::printFunctions(Functions& funcs, const SectionHeaders& headers, const
 				for (uint32_t i = 0; i < lineCount; ++i)
 				{
 					uint32_t size = i < fromNext ? lines[i + 1].offset - lines[i].offset : func.length - lines[i].offset;
-					fprintf(of, "%x %x %u %u\n", lines[i].offset + offset, size, lines[i].flags & CV_Line_Flags::linenumStart, func.fileIndex);
+					fprintf(of, "%x %x %u %u\n", lines[i].offset + func.offset, size, lines[i].flags & CV_Line_Flags::linenumStart, func.fileIndex);
 				}
 			}
 		}
 		else if (func.length)
 		{
-			fprintf(of, "FUNC %x %x 0 %s\n", offset, func.length, func.name.data);
+			fprintf(of, "FUNC %x %x %x %s\n", func.offset, func.length, func.paramSize, func.name.data);
 		}
 		else
 		{
-			fprintf(of, "PUBLIC %x 0 %s\n", offset, func.name.data);
+			fprintf(of, "PUBLIC %x %x %s\n", func.offset, func.paramSize, func.name.data);
 		}
 	}
 }
 
 template<typename T>
 void
-PDBParser::readAndPrintFPO(uint32_t fpoStream, const NameStream& names, FILE* of)
+PDBParser::readFPO(uint32_t fpoStream, std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData)
 {
 	auto& fs = getStream(fpoStream);
 
@@ -1174,8 +1190,46 @@ PDBParser::readAndPrintFPO(uint32_t fpoStream, const NameStream& names, FILE* of
 		auto fh = reader.read<T>();
 		// PDB files contain lots of duplicated FPO records.
 		if (fh.data->ulOffStart != last.ulOffStart || fh.data->cbProcSize != last.cbProcSize || fh.data->cbProlog != last.cbProlog)
-			printFPO(*fh.data, names, of);
-		last = *fh.data;
+		{
+			last = *fh.data;
+			fpoData.insert(std::make_pair(std::make_pair(fh.data->ulOffStart, fh.data->cbProcSize), std::move(fh)));
+		}
+	}
+}
+
+template<typename T>
+bool
+PDBParser::updateParamSize(FunctionRecord& func, std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData)
+{
+	auto p = std::make_pair(func.offset, func.length);
+	auto it = fpoData.find(p);
+	if (it != fpoData.end())
+	{
+		updateParamSize(func, *it->second.data);
+		return true;
+	}
+	return true;
+}
+
+void
+PDBParser::updateParamSize(FunctionRecord& func, const FPO_DATA& fpoData)
+{
+	func.paramSize = fpoData.cdwParams * 4;
+}
+
+void
+PDBParser::updateParamSize(FunctionRecord& func, const FPO_DATA_V2& fpoData)
+{
+	func.paramSize = fpoData.cbParams;
+}
+
+template<typename T>
+void
+PDBParser::printFPOs(std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>& fpoData, const NameStream& names, FILE* of)
+{
+	for (auto& f : fpoData)
+	{
+		printFPO(*f.second.data, names, of);
 	}
 }
 
