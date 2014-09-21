@@ -171,6 +171,7 @@ PDBParser::FunctionRecord& PDBParser::FunctionRecord::operator =(FunctionRecord&
 	std::swap(lineOffset, other.lineOffset);
 	std::swap(typeIndex, other.typeIndex);
 	std::swap(paramSize, other.paramSize);
+	std::swap(isExternC, other.isExternC);
 
 	return *this;
 }
@@ -1013,6 +1014,12 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 				updateParamSize(func, globals);
 			}
 		}
+		// While here, see if this function uses C linkage
+		auto& g = globals.find(func.offset);
+		if (g != globals.end() && g->second.data[0] != '?')
+		{
+			func.isExternC = true;
+		}
 	}
 
 	// Wait for the type stream to be loaded, and all of the src files to be written
@@ -1233,10 +1240,12 @@ PDBParser::getGlobalFunctions(uint16_t symRecStream, const SectionHeaders& heade
 		if (len >= sizeof(GlobalRecord))
 		{
 			auto rec = reader.read<GlobalRecord>();
+			if (rec->leafType == 0x1009)
+				throw std::exception("Global data_v2 records not handled!");
 			auto name = reader.read<char>(len - sizeof(GlobalRecord));
 
 			// Is function?
-			if (rec->symType == 2)
+			if (rec->leafType == 0x110e && rec->symType == 2)
 			{
 				globals.insert(std::make_pair(rec->offset + headers[rec->segment - 1].VirtualAddress, std::move(name)));
 			}
@@ -1312,7 +1321,8 @@ PDBParser::printFunctions(Functions& funcs, const TypeMap& tm, FILE* of)
 
 		if (func.typeIndex)
 		{
-			stringizeType(func.typeIndex, str, tm, IsTopLevel);
+			if (!func.isExternC)
+				stringizeType(func.typeIndex, str, tm, IsTopLevel);
 
 			temp.assign(func.name.data);
 			std::string::size_type pos;

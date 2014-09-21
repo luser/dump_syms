@@ -183,6 +183,7 @@ private:
 		uint32_t			lineOffset;
 		uint32_t			typeIndex;	// If this is non-zero, the function is a procedure, not a thunk (I don't know how to read thunk type info...)
 		uint32_t			paramSize;
+		bool				isExternC;
 
 		FunctionRecord(uint32_t offset, uint32_t segment)
 			: segment(segment)
@@ -200,6 +201,7 @@ private:
 			, lineOffset(0)
 			, typeIndex(0)
 			, paramSize(0)
+			, isExternC(false)
 		{}
 
 		bool operator <(const FunctionRecord& other) const
