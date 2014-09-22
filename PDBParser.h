@@ -28,16 +28,23 @@
 #include <map>
 #include <string>
 #include <unordered_map>
+#include <stdlib.h>
+#ifdef _WIN32
+#define NOMINMAX
 #include <windows.h>
+#endif
 
 #include "PDBHeaders.h"
+#ifndef _WIN32
+#include "WinStructs.h"
+#endif
 
 typedef void* HANDLE;
-typedef IMAGE_SECTION_HEADER SectionHeader;
 
 namespace google_breakpad
 {
 
+typedef IMAGE_SECTION_HEADER SectionHeader;
 class StreamReader;
 
 template<typename T>
@@ -87,13 +94,44 @@ private:
 	DataPtr& operator =(const DataPtr&) { return *this; }
 };
 
+class MMapWrapper
+{
+public:
+	MMapWrapper() :
+#ifdef _WIN32
+		m_mapFile(0),
+#else
+		m_length(0),
+#endif
+		m_base(nullptr)
+	{}
+
+	bool Map(const char* filename);
+	bool Unmap();
+	bool Valid()
+	{
+#ifdef _WIN32
+		return m_mapFile != nullptr && m_base != nullptr;
+#else
+		return m_base != nullptr;
+#endif
+	}
+	const uint8_t* base() const { return m_base; }
+private:
+#ifdef _WIN32
+	HANDLE			m_mapFile;
+#else
+	size_t			m_length;
+#endif
+	const uint8_t*	m_base;
+};
+
 class PDBParser
 {
 public:
 
 	PDBParser()
 		: m_base(nullptr)
-		, m_mapFile(0)
 	{}
 
 	~PDBParser() { close(); }
@@ -149,7 +187,7 @@ private:
 			, segment(segment)
 		{}
 
-		FunctionRecord(const DataPtr<char>&& iname)
+		FunctionRecord(DataPtr<char>&& iname)
 			: name(std::move(iname))
 			, segment(0)
 			, offset(0)
@@ -297,7 +335,7 @@ private:
 	GUID			m_guid;		//!< Unique GUID for the PDB, found in the NameIndexHeader in the root stream, matches the guid returned by IDiaSession::get_globalScope()->get_guid()
 
 	const uint8_t*	m_base;
-	HANDLE			m_mapFile;
+	MMapWrapper		m_mapping;
 	std::string		m_filename;
 
 	uint32_t m_PETimeStamp;	//!< Timestamp for the executable

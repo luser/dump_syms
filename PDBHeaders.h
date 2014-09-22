@@ -23,12 +23,24 @@
 #pragma once
 
 #include <stdint.h>
+#ifdef _WIN32
 #include <Guiddef.h>
+#endif
 
 namespace google_breakpad
 {
 // All the structs here are read in-place from the PDB, so they need to be packed to match their figurative size
 #pragma pack(push, 1)
+#ifndef _WIN32
+	struct GUID
+	{
+		uint32_t	Data1;
+		uint16_t	Data2;
+		uint16_t	Data3;
+		uint8_t		Data4[8];
+	};
+#endif
+
 	struct PDBHeader
 	{
 		char		signature[32];

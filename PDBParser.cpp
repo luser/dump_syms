@@ -25,11 +25,128 @@
 #include "utils.h"
 #include <assert.h>
 #include <algorithm>
+#ifdef _WIN32
 #include <atlfile.h>
 #include <ppl.h>
+#else
+#include <fcntl.h>
+#include <sys/mman.h>
+#include <sys/stat.h>
+#include <unistd.h>
+#endif
+#include <string.h>
+
+#ifndef _WIN32
+#include <errno.h>
+
+int fopen_s(FILE** f, const char* filename, const char* mode)
+{
+	*f = fopen(filename, mode);
+	if (*f)
+		return 0;
+	return errno;
+}
+
+namespace Concurrency
+{
+	enum task_group_status {
+		canceled,
+		completed,
+		not_complete
+	};
+
+	//TODO: actually implement this with some parallelism library
+	class task_group
+	{
+	public:
+		task_group() {}
+		task_group_status wait()
+		{
+			return completed;
+		}
+		template<typename _Function>
+		void run(const _Function& _Func)
+		{
+			_Func();
+		}
+	};
+
+	template<typename _Random_iterator>
+	inline void parallel_sort(const _Random_iterator &_Begin,
+		const _Random_iterator &_End)
+	{
+		std::sort(_Begin, _End);
+	}
+}
+#endif
 
 namespace google_breakpad
 {
+
+bool MMapWrapper::Map(const char* path)
+{
+#ifdef _WIN32
+	CAtlFile file;
+	HRESULT result = file.Create(path, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING);
+	if (FAILED(result))
+		return false;
+
+	m_mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, 0);
+	if (m_mapFile == nullptr)
+		return false;
+
+	m_base = (const uint8_t*)MapViewOfFile(m_mapFile, FILE_MAP_READ, 0, 0, 0);
+
+	if (m_base == nullptr)
+		return false;
+#else // !_WIN32
+		int fd = open(path, O_RDONLY, 0);
+		if (fd == -1)
+			return false;
+
+#if defined(__x86_64__)
+		struct stat st;
+		if (fstat(fd, &st) == -1 || st.st_size < 0)
+		{
+#else
+		struct stat64 st;
+		if (fstat64(fd, &st) == -1 || st.st_size < 0)
+		{
+#endif
+#if 0
+		}
+#endif
+			close(fd);
+			return false;
+		}
+		m_length = st.st_size;
+
+#if defined(__x86_64__)
+		void* data = mmap(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+#else
+		void* data = mmap2(NULL, st.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
+#endif
+		close(fd);
+		if (data == MAP_FAILED)
+			return false;
+		m_base = reinterpret_cast<const uint8_t*>(data);
+#endif
+		return true;
+}
+
+bool MMapWrapper::Unmap()
+{
+	if (!Valid())
+		return false;
+
+#ifdef _WIN32
+	UnmapViewOfFile(m_base);
+	CloseHandle(m_mapFile);
+#else
+	munmap(const_cast<uint8_t*>(m_base), m_length);
+#endif
+	return true;
+}
 
 PDBParser::FunctionRecord& PDBParser::FunctionRecord::operator =(FunctionRecord&& other)
 {
@@ -167,7 +284,7 @@ public:
 
 			while (toRead > 0)
 			{
-				uint32_t seqRead = min((uint32_t)(m_seqPageEnd - m_data), toRead);
+                          uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
 
 				// Hack
 				if (seqRead == 0)
@@ -206,7 +323,7 @@ public:
 
 			while (toRead > 0)
 			{
-				uint32_t seqRead = min((uint32_t)(m_seqPageEnd - m_data), toRead);
+                          uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
 
 				// Hack
 				if (seqRead == 0)
@@ -279,22 +396,13 @@ private:
 void
 PDBParser::load(const char* path)
 {
-	CAtlFile file;
-	HRESULT result = file.Create(path, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING);
-	if (FAILED(result))
-		throw std::exception("Failed to load PDB file");
+	if (!m_mapping.Map(path))
+		throw std::runtime_error("Failed to load PDB file");
 
-	m_mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, 0);
-	if (m_mapFile == nullptr)
-		throw std::exception("Failed to create file mapping");
-
-	m_base = (uint8_t*)MapViewOfFile(m_mapFile, FILE_MAP_READ, 0, 0, 0);
-
-	if (m_base == nullptr)
-		throw std::exception("Failed to map view of file");
+	m_base = m_mapping.base();
 
 	if (!readRootStream())
-		throw std::exception("Failed to read PDB Root Stream");
+		throw std::runtime_error("Failed to read PDB Root Stream");
 
 	// Find and read the executable that is paired with this PDB,
 	// because unfortunately the PDB doesn't contain the necessary info
@@ -314,7 +422,7 @@ PDBParser::load(const char* path)
 		m_filename.erase(m_filename.size() - 3, 3);
 		m_filename += "dll";
 		if (fopen_s(&exeFile, m_filename.c_str(), "rb") != 0)
-			throw std::exception("Failed to find paired exe/dll file");
+			throw std::runtime_error("Failed to find paired exe/dll file");
 
 		m_isExe = false;
 	}
@@ -333,7 +441,7 @@ PDBParser::load(const char* path)
 		fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, exeFile);
 
 		if (dosHeader.e_magic != 23117 /* "PE\0\0" */)
-			throw std::exception("Invalid PE header detected");
+			throw std::runtime_error("Invalid PE header detected");
 
 		fseek(exeFile, dosHeader.e_lfanew, SEEK_SET);
 
@@ -343,7 +451,7 @@ PDBParser::load(const char* path)
 		// Ignore this if it's powerPC because...xenon
 		// Detect if the executable/dll is actually a CLR assembly, which is not supported
 		if (header.FileHeader.Machine == 0x01F2 && header.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
-			throw std::exception("The image is a CLR assembly, which is not supported");
+			throw std::runtime_error("The image is a CLR assembly, which is not supported");
 
 		m_PETimeStamp = header.FileHeader.TimeDateStamp;
 
@@ -431,7 +539,7 @@ PDBParser::readRootStream()
 			uint32_t numToCopy = numPages;
 			do 
 			{
-				uint32_t num = min(numToCopy, numItems - pageOffset);
+				uint32_t num = std::min(numToCopy, numItems - pageOffset);
 				memcpy(m_streams[i].pageIndices.data() + numPages - numToCopy, page + pageOffset, sizeof(uint32_t) * num);
 				numToCopy -= num;
 				pageOffset += num;
@@ -487,7 +595,7 @@ PDBParser::loadNameStream(NameStream& names)
 {
 	auto nIter = m_nameIndices.find("/NAMES");
 	if (nIter == m_nameIndices.end())
-		throw std::exception("Could not find /NAMES in name indices");
+		throw std::runtime_error("Could not find /NAMES in name indices");
 
 	struct NameStreamHeader
 	{
@@ -512,12 +620,12 @@ PDBParser::loadNameStream(NameStream& names)
 		memcpy(tempData + i * m_pageSize, m_base + ns.pageIndices[i] * m_pageSize, m_pageSize);
 
 	// The last page may be shorter than the actual page size
-	memcpy(tempData + last * m_pageSize, m_base + ns.pageIndices[last] * m_pageSize, min(m_pageSize, ns.size - last * m_pageSize));
+	memcpy(tempData + last * m_pageSize, m_base + ns.pageIndices[last] * m_pageSize, std::min(m_pageSize, ns.size - last * m_pageSize));
 
 	const NameStreamHeader* nsh = (NameStreamHeader*)tempData;
 
 	if (nsh->sig != 0xeffeeffe || nsh->version != 1)
-		throw std::exception("Invalid name stream");
+		throw std::runtime_error("Invalid name stream");
 
 	const uint32_t* offsets = (uint32_t*)(tempData + sizeof(NameStreamHeader) + nsh->offset);
 	uint32_t size = *offsets++;
@@ -531,7 +639,7 @@ PDBParser::loadNameStream(NameStream& names)
 		{
 			DataPtr<char> data(nameStart + id);
 			if (data.data != nullptr)
-				names.map.insert(std::make_pair(id, data));
+                          names.map.insert(std::make_pair(id, std::move(data)));
 		}
 	}
 }
@@ -630,8 +738,7 @@ PDBParser::loadTypeStream()
 void
 PDBParser::close()
 {
-	UnmapViewOfFile(m_base);
-	CloseHandle(m_mapFile);
+  m_mapping.Unmap();
 }
 
 struct SymbolSource
@@ -771,7 +878,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 
 	// Check to see if we need to remap functions
 	if (debugHeader->tokenRidMap != 0 && debugHeader->tokenRidMap != 0xffff)
-		throw std::exception("Implement me...");
+		throw std::runtime_error("Implement me...");
 	
 	// Get functions from the global stream. These have mangled names that are useful.
 	Globals globals;
@@ -857,7 +964,7 @@ PDBParser::readModule(const DBIModuleInfo* module, int32_t section, ModuleReadCB
 	auto sig = reader.read<int32_t>();
 
 	if (*sig.data != 4)
-		throw std::exception("Invalid module stream signature");
+		throw std::runtime_error("Invalid module stream signature");
 
 	// Skip functions
 	reader.seek(module->cbSyms + module->cbOldLines);
@@ -985,7 +1092,7 @@ PDBParser::getModuleFunctions(const DBIModuleInfo* module, Functions& funcs)
 	auto sig = reader.read<int32_t>();
 
 	if (*sig.data != 4)
-		throw std::exception("Invalid module stream signature");
+		throw std::runtime_error("Invalid module stream signature");
 
 	struct SymbolHeader
 	{

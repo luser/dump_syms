@@ -21,11 +21,15 @@
 // Original author: Jake Shadle <jake.shadle@frostbite.com>
 
 #include "utils.h"
+#ifdef _WIN32
 #include <windows.h>
+#endif
 
+#ifdef _WIN32
 std::string
 getHResultString(long code)
 {
+
 	LPSTR msgBuff = nullptr;
 	DWORD num = FormatMessageA(	FORMAT_MESSAGE_ALLOCATE_BUFFER |
 					FORMAT_MESSAGE_FROM_SYSTEM |
@@ -43,6 +47,7 @@ getHResultString(long code)
 
 	return ret;
 }
+#endif
 
 char* strupper(char* str)
 {

@@ -5,3 +5,4 @@ dump_syms.vcxproj.*
 *~
 Debug/*
 Release/*
+out/*

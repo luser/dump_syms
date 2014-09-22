@@ -11,6 +11,7 @@
         'conditions': [
             ['OS!="win"', {
                 'cflags': [
+                    '-g',
                     '--std=c++11',
                 ],
             }],
