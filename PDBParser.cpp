@@ -1156,13 +1156,21 @@ PDBParser::getGlobalFunctions(uint16_t symRecStream, const SectionHeaders& heade
 	while (reader.getOffset() < pair.size)
 	{
 		auto len = *reader.read<uint16_t>().data;
-		auto rec = reader.read<GlobalRecord>();
-		auto name = reader.read<char>(len - sizeof(GlobalRecord));
-
-		// Is function?
-		if (rec->symType == 2)
+		if (len >= sizeof(GlobalRecord))
 		{
-			globals.insert(std::make_pair(rec->offset + headers[rec->segment - 1].VirtualAddress, std::move(name)));
+			auto rec = reader.read<GlobalRecord>();
+			auto name = reader.read<char>(len - sizeof(GlobalRecord));
+
+			// Is function?
+			if (rec->symType == 2)
+			{
+				globals.insert(std::make_pair(rec->offset + headers[rec->segment - 1].VirtualAddress, std::move(name)));
+			}
+		}
+		else
+		{
+			// Just skip this data, we don't know how to handle it.
+			reader.seek(reader.getOffset() + len);
 		}
 	}
 }
