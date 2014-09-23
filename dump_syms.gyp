@@ -12,6 +12,8 @@
             ['OS!="win"', {
                 'cflags': [
                     '-g',
+                    '-Wall',
+                    '-Werror',
                     '--std=c++11',
                 ],
             }],
