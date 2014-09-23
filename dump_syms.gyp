@@ -9,7 +9,15 @@
             'utils.cpp',
         ],
         'conditions': [
-            ['OS!="win"', {
+            ['OS=="win"', {
+                'msvs_settings': {
+                    'VCCLCompilerTool': {
+                        'ExceptionHandling': '1',
+                        'WarnAsError': 'true',
+                        'Optimization': '0',
+                    },
+                },
+            }, { # OS != "win"
                 'cflags': [
                     '-g',
                     '-Wall',
