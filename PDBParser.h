@@ -183,18 +183,20 @@ private:
 		uint32_t			paramSize;
 
 		FunctionRecord(uint32_t offset, uint32_t segment)
-			: offset(offset)
-			, segment(segment)
+			: segment(segment)
+			, offset(offset)
+
 		{}
 
 		FunctionRecord(DataPtr<char>&& iname)
 			: name(std::move(iname))
+			, lineCount(0)
 			, segment(0)
 			, offset(0)
-			, typeIndex(0)
-			, lineCount(0)
-			, lineOffset(0)
 			, fileIndex(0)
+			, length(0)
+			, lineOffset(0)
+			, typeIndex(0)
 			, paramSize(0)
 		{}
 

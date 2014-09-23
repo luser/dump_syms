@@ -180,11 +180,11 @@ public:
 	StreamReader(const PDBParser::StreamPair& stream, const PDBParser& parser, uint32_t offset = 0)
 		: m_stream(stream)
 		, m_parser(parser)
+		, m_data(nullptr)
+		, m_seqPageEnd(nullptr)
 		, m_offset(0xffffffff)
 		, m_pageIndex(0xffffffff)
 		, m_pageEndIndex(0)
-		, m_data(nullptr)
-		, m_seqPageEnd(nullptr)
 	{
 		seek(offset);
 	}
@@ -1197,8 +1197,8 @@ PDBParser::resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, c
 			}
 
 			auto& function = funcs[min];
-			if (function.lineOffset != 0 && function.lineOffset - function.offset < ls->off - function.offset
-				|| function.lineCount & 0xF0000000) // This means the first function always wins, which seems to be the behavior of the original Breakpad implementation
+			if (function.lineOffset != 0 && (function.lineOffset - function.offset < ls->off - function.offset
+				|| function.lineCount & 0xF0000000)) // This means the first function always wins, which seems to be the behavior of the original Breakpad implementation
 				return;
 
 			auto srcfile = reader.read<CV_SourceFile>();
