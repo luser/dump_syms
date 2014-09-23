@@ -438,7 +438,8 @@ PDBParser::load(const char* path)
 	do
 	{
 		IMAGE_DOS_HEADER dosHeader;
-		fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, exeFile);
+		if (fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, exeFile) != 1)
+			throw std::runtime_error("Error reading PE header");
 
 		if (dosHeader.e_magic != 23117 /* "PE\0\0" */)
 			throw std::runtime_error("Invalid PE header detected");
@@ -446,7 +447,8 @@ PDBParser::load(const char* path)
 		fseek(exeFile, dosHeader.e_lfanew, SEEK_SET);
 
 		IMAGE_NT_HEADERS64 header;
-		fread(&header, sizeof(IMAGE_NT_HEADERS64), 1, exeFile);
+		if (fread(&header, sizeof(IMAGE_NT_HEADERS64), 1, exeFile) != 1)
+			throw std::runtime_error("Error reading PE NT header");
 
 		// Ignore this if it's powerPC because...xenon
 		// Detect if the executable/dll is actually a CLR assembly, which is not supported
