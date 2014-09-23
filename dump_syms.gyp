@@ -1,4 +1,7 @@
 {
+    'variables': {
+        'have_tbb': '<!(! pkg-config --atleast-version=2.2 tbb; echo $?)',
+    },
     'targets': [
     {
         'target_name': 'dump_syms',
@@ -23,6 +26,17 @@
                     '-Wall',
                     '-Werror',
                     '--std=c++11',
+                ],
+            }],
+            ['<(have_tbb)==1', {
+                'cflags': [
+                    '<!@(pkg-config --cflags tbb)',
+                ],
+                'libraries': [
+                    '<!@(pkg-config --libs tbb)',
+                ],
+                'defines': [
+                    'HAVE_TBB',
                 ],
             }],
         ]

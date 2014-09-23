@@ -33,6 +33,11 @@
 #include <sys/mman.h>
 #include <sys/stat.h>
 #include <unistd.h>
+#ifdef HAVE_TBB
+#include "tbb/task_group.h"
+#include "tbb/parallel_sort.h"
+#include "tbb/compat/ppl.h"
+#endif
 #endif
 #include <string.h>
 
@@ -49,13 +54,16 @@ int fopen_s(FILE** f, const char* filename, const char* mode)
 
 namespace Concurrency
 {
+#ifdef HAVE_TBB
+	using tbb::parallel_sort;
+#else
+	// Single-threaded implementation of the bits of PPL we're using.
 	enum task_group_status {
 		canceled,
 		completed,
 		not_complete
 	};
 
-	//TODO: actually implement this with some parallelism library
 	class task_group
 	{
 	public:
@@ -77,6 +85,7 @@ namespace Concurrency
 	{
 		std::sort(_Begin, _End);
 	}
+#endif
 }
 #endif
 
