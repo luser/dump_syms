@@ -1577,6 +1577,7 @@ namespace google_breakpad
 			StringTable		= 0xF3,
 			FileChecksums	= 0xF4,
 			FrameData		= 0xF5,
+			_Unknown1		= 0xF6,			// Encountered, don't know what it is though
 		};
 	};
 
@@ -1769,6 +1770,15 @@ namespace google_breakpad
 		//internal byte[] variant;    // variant portion of thunk
 	};
 
+	struct BlockSym32
+	{
+		uint32_t	parent;
+		uint32_t	end;
+		uint32_t	len;
+		uint32_t	off;
+		uint16_t	seg;
+	};
+
 	struct CV_LineSection
 	{
 		uint32_t		off;
@@ -1781,7 +1791,7 @@ namespace google_breakpad
 	{
 		uint32_t	index;          // Index to file in checksum section.
 		uint32_t	count;          // Number of CV_Line records.
-		uint32_t	linsiz;         // Size of CV_Line recods.
+		uint32_t	linsiz;         // Size of CV_Line records.
 	};
 
 	struct CV_Line_Flags

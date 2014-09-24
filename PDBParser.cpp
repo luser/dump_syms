@@ -202,6 +202,12 @@ public:
 	uint32_t getOffset() const { return m_offset; }
 	const uint8_t* getData() const { return m_data; };
 
+	bool isValidOffset(uint32_t offset)
+	{
+		uint32_t index = offset / m_parser.pageSize();
+		return index < m_stream.pageIndices.size();
+	}
+
 	static const uint8_t* getData(const PDBParser::StreamPair& stream, const PDBParser& parser, uint32_t offset = 0)
 	{
 		int index = offset / parser.pageSize();
@@ -222,9 +228,6 @@ public:
 
 	void seek(uint32_t offset)
 	{
-		if (offset == m_offset)
-			return;
-
 		uint32_t index = offset / m_parser.pageSize();
 
 		if (index == m_pageIndex)
@@ -237,6 +240,9 @@ public:
 			m_offset = offset;
 			return;
 		}
+
+		if (index >= m_stream.pageIndices.size())
+			throw std::runtime_error("Requesting offset outside of page range");
 
 		const uint8_t* base = m_parser.data() + m_stream.pageIndices[index] * m_parser.pageSize();
 		m_data = base + offset % m_parser.pageSize();
@@ -257,7 +263,7 @@ public:
 			assert(m_seqPageEnd > m_data);
 			return;
 		}
-		else if (m_stream.pageIndices[index] + count - index != m_stream.pageIndices[last])
+		else
 		{
 			// Scan forward to find the first non-adjacent page
 			uint32_t expected = m_stream.pageIndices[index] + 1;
@@ -294,7 +300,7 @@ public:
 
 			while (toRead > 0)
 			{
-                          uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
+				uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
 
 				// Hack
 				if (seqRead == 0)
@@ -333,7 +339,7 @@ public:
 
 			while (toRead > 0)
 			{
-                          uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
+				uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
 
 				// Hack
 				if (seqRead == 0)
@@ -372,6 +378,13 @@ public:
 
 		do
 		{
+			if (toCopy == m_seqPageEnd)
+			{
+				needsSeek = true;
+				seek(m_offset + strLen + 1);
+				toCopy = m_data - 1;
+			}
+
 			if (*toCopy++ == 0)
 			{
 				if (needsSeek)
@@ -381,13 +394,6 @@ public:
 			}
 
 			++strLen;
-
-			if (toCopy == m_seqPageEnd)
-			{
-				needsSeek = true;
-				seek(m_offset + strLen);
-				toCopy = m_data;
-			}
 		} while(true);
 	}
 
@@ -460,17 +466,28 @@ PDBParser::load(const char* path)
 		if (fread(&header, sizeof(IMAGE_NT_HEADERS64), 1, exeFile) != 1)
 			throw std::runtime_error("Error reading PE NT header");
 
-		// Ignore this if it's powerPC because...xenon
-		// Detect if the executable/dll is actually a CLR assembly, which is not supported
-		if (header.FileHeader.Machine == 0x01F2 && header.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
-			throw std::runtime_error("The image is a CLR assembly, which is not supported");
-
 		m_PETimeStamp = header.FileHeader.TimeDateStamp;
 
 		if (header.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+		{
+			// Ignore this if it's powerPC because...xenon
+			// Detect if the executable/dll is actually a CLR assembly, which is not supported
+			if (header.FileHeader.Machine != 0x01F2 && header.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
+				throw std::runtime_error("The image is a CLR assembly, which is not supported");
+
 			m_PESize = header.OptionalHeader.SizeOfImage;
+		}
+		else if (header.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+		{
+			const IMAGE_NT_HEADERS32* header32 = (const IMAGE_NT_HEADERS32*)&header;
+			if (header32->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
+				throw std::runtime_error("The image is a CLR assembly, which is not supported");
+
+			m_PESize = header32->OptionalHeader.SizeOfImage;
+		}
 		else
-			m_PESize = ((IMAGE_NT_HEADERS32*)&header)->OptionalHeader.SizeOfImage;
+			throw std::runtime_error("Unknown image format");
+
 	} while(0);
 
 	fclose(exeFile);
@@ -493,11 +510,13 @@ PDBParser::readRootStream()
 
 	uint32_t rootSize = header->directorySize;
 	uint32_t numRootPages = getNumPages(rootSize, m_pageSize);
+	uint32_t rootSize = header->directorySize;
+	uint32_t numRootPages = getNumPages(rootSize, m_pageSize);
 	uint32_t numRootIndexPages = getNumPages(numRootPages * 4, m_pageSize);
 
 	const uint32_t* rootIndices = (const uint32_t*)(m_base + sizeof(PDBHeader));
 	std::vector<uint32_t> rootPageList;
-	for (uint32_t i=0; i < numRootIndexPages; ++i) {
+	for (uint32_t i = 0; i < numRootIndexPages; ++i) {
 		const uint32_t* rootPages = (const uint32_t*)(m_base + rootIndices[i] * m_pageSize);
 		rootPageList.insert(rootPageList.end(), rootPages, rootPages + (m_pageSize / sizeof(uint32_t)));
 	}
@@ -565,41 +584,65 @@ PDBParser::readRootStream()
 		}
 	}
 
-	const uint8_t* data = StreamReader::getData(m_streams[1], *this);
-	const NameIndexHeader* niHeader = (const NameIndexHeader*)data;
+	uint32_t numOk = 0;
 
-	m_guid = niHeader->guid;
-
-	// The assumption is made that all of the name indices are in adjacent pages, this seems to hold
-	// true...
-	const char* names = ((const char*)data + sizeof(NameIndexHeader));
-	const uint32_t* pdw = (const uint32_t*)(names + niHeader->names);
-
-	uint32_t numOK = *pdw++;
-	uint32_t count = *pdw++;
-	const uint32_t* ok_bits = pdw;
-	pdw += *ok_bits++ + 1;
-	if (*pdw++ != 0)
-		return false;
-
-	for (uint32_t i = 0; i < count; ++i)
 	{
-		if (ok_bits[i >> 5] & (1 << (i % 32)))
-		{
-			uint32_t strid = *pdw++;
-			uint32_t streamid = *pdw++;
-			const char* tempname = &names[strid];
-			
-			std::string name(tempname);
-			strupper((char*)name.c_str());
-			
-			m_nameIndices.insert(std::make_pair(std::move(name), streamid));
+		StreamReader nameReader(m_streams[1], *this);
 
-			numOK--;
+		auto nameIndexHeader = nameReader.read<NameIndexHeader>();
+		m_guid = nameIndexHeader->guid;
+
+		uint32_t nameStart = nameReader.getOffset();
+
+		StreamReader mapReader(m_streams[1], *this);
+		mapReader.seek(nameStart + nameIndexHeader->names);
+
+		numOk = *mapReader.read<uint32_t>().data;
+		uint32_t count = *mapReader.read<uint32_t>().data;
+
+		uint32_t okOffset = mapReader.getOffset();
+		uint32_t skip = *mapReader.read<uint32_t>().data;
+
+		if ((count >> 5) > skip)
+		{
+			fprintf(stderr, "Invalid name index\n");
+			return false;
+		}
+
+		auto okBits = mapReader.read<uint32_t>((count >> 5) * sizeof(uint32_t));
+
+		mapReader.seek(okOffset + (skip + 1) * sizeof(uint32_t));
+
+		uint32_t verification = *mapReader.read<uint32_t>().data;
+		if (verification != 0)
+		{
+			fprintf(stderr, "Invalid name index\n");
+			return false;
+		}
+
+		struct StringVal
+		{
+			uint32_t id;
+			uint32_t stream;
+		};
+
+		for (uint32_t i = 0; i < count; ++i)
+		{
+			if (!(okBits.data[i >> 5] & (1 << (i % 32))))
+				continue;
+
+			auto val = mapReader.read<StringVal>();
+			nameReader.seek(nameStart + val->id);
+			std::string name = nameReader.readString().data;
+			strupper((char*)name.c_str());
+
+			m_nameIndices.insert(std::make_pair(std::move(name), val->stream));
+
+			numOk--;
 		}
 	}
-
-	return numOK == 0;
+	
+	return numOk == 0;
 }
 
 void
@@ -651,7 +694,7 @@ PDBParser::loadNameStream(NameStream& names)
 		{
 			DataPtr<char> data(nameStart + id);
 			if (data.data != nullptr)
-                          names.map.insert(std::make_pair(id, std::move(data)));
+				names.map.insert(std::make_pair(id, std::move(data)));
 		}
 	}
 }
@@ -660,6 +703,8 @@ PDBParser::TypeMap
 PDBParser::loadTypeStream()
 {
 	auto& ts = getStream(TypeInfoStream);
+	if (ts.size == 0)
+		throw std::runtime_error("Invalid type info stream");
 
 	StreamReader reader(ts, *this);
 
@@ -669,12 +714,19 @@ PDBParser::loadTypeStream()
 	map.reserve(tih->max - tih->min);
 	uint32_t end = reader.getOffset();
 	
-	for (uint32_t i = tih->min; i <= tih->max; ++i)
+	for (uint32_t i = tih->min; i < tih->max; ++i)
 	{
 		reader.seek(end);
 		reader.align(sizeof(TypeRecord));
 
 		auto tr = reader.read<TypeRecord>();
+		if (tr->length == 0)
+			throw std::runtime_error("Invalid type info stream");
+
+		// No type, which can happen rarely, do NOT adjust when encountered
+		if (tr->leafType == 0)
+			continue;
+
 		end = reader.getOffset() + tr->length - sizeof(uint16_t);
 
 		TypeInfo nfo;
@@ -763,6 +815,8 @@ void
 PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod)
 {
 	const StreamPair& pair = getStream(DebugInfo);
+	if (pair.size == 0)
+		throw std::runtime_error("Invalid DebugInfo stream");
 
 	StreamReader reader(pair, *this);
 	auto header = reader.read<DBIHeader>();
@@ -840,17 +894,23 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 	UniqueSrcFiles unique;
 	for (auto& mod : modules)
 	{
+		if (mod.info.data->stream < 0)
+		{
+			fprintf(stderr, "Invalid module found gathering files...\n");
+			continue;
+		}
+
 		getModuleFiles(mod.info.data, id, unique, mod.srcIndex);
 	}
 
 	NameStream names;
-	loadNameStream(names);
 
 	// Start printing the module files in a separate thread
 	Concurrency::task_group tg;
 	tg.run(
-		[this, &unique, &modules, &names, of, fileMod]()
-		{
+		[this, &unique, &modules, of, fileMod]() {
+			loadNameStream(names);
+
 			auto end = names.map.end();
 
 			for (auto& mod : modules)
@@ -882,11 +942,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		});
 
 	TypeMap tm;
-	tg.run(
-		[this, &tm]
-		{
-			tm = loadTypeStream();
-		});
+	tg.run([this, &tm] { tm = loadTypeStream(); });
 
 	// Check to see if we need to remap functions
 	if (debugHeader->tokenRidMap != 0 && debugHeader->tokenRidMap != 0xffff)
@@ -997,6 +1053,9 @@ PDBParser::readModule(const DBIModuleInfo* module, int32_t section, ModuleReadCB
 
 		uint32_t end = reader.getOffset() + header->size;
 		
+		if (!reader.isValidOffset(end))
+			throw std::runtime_error("Invalid subsection header detected");
+
 		if (header->sig == section)
 			cb(reader, header->sig, end);
 
@@ -1271,10 +1330,21 @@ PDBParser::printFunctions(Functions& funcs, const TypeMap& tm, FILE* of)
 			{
 				const CV_Line* lines = (const CV_Line*)func.lines.data;
 				uint32_t fromNext = lineCount - 1;
+
+				// Handle rare case where the last line offset exceeds the actual function length,
+				// have only encountered this with '__security_check_cookie()'
+				uint32_t modifier = 0;
+				if (lines[fromNext].offset > func.length)
+				{
+					modifier = lines[fromNext].offset - func.length;
+					if (uint32_t diff = modifier % 16)
+						modifier = modifier + 16 - diff;
+				}
+
 				for (uint32_t i = 0; i < lineCount; ++i)
 				{
-					uint32_t size = i < fromNext ? lines[i + 1].offset - lines[i].offset : func.length - lines[i].offset;
-					fprintf(of, "%x %x %u %u\n", lines[i].offset + func.offset, size, lines[i].flags & CV_Line_Flags::linenumStart, func.fileIndex);
+					uint32_t size = i < fromNext ? lines[i + 1].offset - lines[i].offset : func.length + modifier - lines[i].offset;
+					fprintf(of, "%x %x %u %u\n", lines[i].offset + func.offset - modifier, size, lines[i].flags & CV_Line_Flags::linenumStart, func.fileIndex);
 				}
 			}
 		}
