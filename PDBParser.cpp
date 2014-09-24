@@ -299,7 +299,7 @@ public:
 
 			while (toRead > 0)
 			{
-				uint32_t seqRead = min((uint32_t)(m_seqPageEnd - m_data), toRead);
+				uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
 
 				// Hack
 				if (seqRead == 0)
@@ -338,7 +338,7 @@ public:
 
 			while (toRead > 0)
 			{
-				uint32_t seqRead = min((uint32_t)(m_seqPageEnd - m_data), toRead);
+				uint32_t seqRead = std::min((uint32_t)(m_seqPageEnd - m_data), toRead);
 
 				// Hack
 				if (seqRead == 0)
@@ -509,9 +509,16 @@ PDBParser::readRootStream()
 
 	uint32_t rootSize = header->directorySize;
 	uint32_t numRootPages = getNumPages(rootSize, m_pageSize);
-	
-	uint32_t rootIndex = header->tocPageIndex;
-	const uint32_t* rootPageList = (const uint32_t*)(m_base + rootIndex * m_pageSize);
+	uint32_t rootSize = header->directorySize;
+	uint32_t numRootPages = getNumPages(rootSize, m_pageSize);
+	uint32_t numRootIndexPages = getNumPages(numRootPages * 4, m_pageSize);
+
+	const uint32_t* rootIndices = (const uint32_t*)(m_base + sizeof(PDBHeader));
+	std::vector<uint32_t> rootPageList;
+	for (uint32_t i = 0; i < numRootIndexPages; ++i) {
+		const uint32_t* rootPages = (const uint32_t*)(m_base + rootIndices[i] * m_pageSize);
+		rootPageList.insert(rootPageList.end(), rootPages, rootPages + (m_pageSize / sizeof(uint32_t)));
+	}
 
 	uint32_t pageIndex = 0;
 	uint32_t pageOffset = 0;
@@ -895,11 +902,12 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		getModuleFiles(mod.info.data, id, unique, mod.srcIndex);
 	}
 
+	NameStream names;
+
 	// Start printing the module files in a separate thread
 	Concurrency::task_group tg;
 	tg.run(
 		[this, &unique, &modules, of, fileMod]() {
-			NameStream names;
 			loadNameStream(names);
 
 			auto end = names.map.end();
