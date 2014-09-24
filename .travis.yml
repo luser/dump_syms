@@ -4,7 +4,7 @@ compiler:
   - clang
 before_install:
   - sudo apt-get update -qq
-  - sudo apt-get install -y gyp ninja-build
+  - sudo apt-get install -y gyp ninja-build binutils-gold
 script:
   - CXXFLAGS=-O2 gyp -f ninja --depth=. ./dump_syms.gyp
   - ninja -C out/Default
