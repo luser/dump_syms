@@ -39,6 +39,7 @@
 #include "tbb/compat/ppl.h"
 #endif
 #endif
+#include <stdexcept>
 #include <string.h>
 
 #ifndef _WIN32
