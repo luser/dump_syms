@@ -133,12 +133,13 @@ public:
 
 	PDBParser()
 		: m_base(nullptr)
+		, m_foundPE(false)
 	{}
 
 	~PDBParser() { close(); }
-	
+
 	void load(const char* path);
-	
+
 	void close();
 
 	enum KnownStreams
@@ -341,6 +342,7 @@ private:
 	MMapWrapper		m_mapping;
 	std::string		m_filename;
 
+	bool m_foundPE;
 	uint32_t m_PETimeStamp;	//!< Timestamp for the executable
 	uint32_t m_PESize;		//!< Size of the executable
 

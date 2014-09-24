@@ -439,7 +439,7 @@ PDBParser::load(const char* path)
 		m_filename.erase(m_filename.size() - 3, 3);
 		m_filename += "dll";
 		if (fopen_s(&exeFile, m_filename.c_str(), "rb") != 0)
-			throw std::runtime_error("Failed to find paired exe/dll file");
+			fprintf(stderr, "Failed to find paired exe/dll file");
 
 		m_isExe = false;
 	}
@@ -452,46 +452,50 @@ PDBParser::load(const char* path)
 	if (loc != std::string::npos)
 		m_filename.erase(0, loc + 1);
 
-	do
+	if (exeFile)
 	{
-		IMAGE_DOS_HEADER dosHeader;
-		if (fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, exeFile) != 1)
-			throw std::runtime_error("Error reading PE header");
-
-		if (dosHeader.e_magic != 23117 /* "PE\0\0" */)
-			throw std::runtime_error("Invalid PE header detected");
-
-		fseek(exeFile, dosHeader.e_lfanew, SEEK_SET);
-
-		IMAGE_NT_HEADERS64 header;
-		if (fread(&header, sizeof(IMAGE_NT_HEADERS64), 1, exeFile) != 1)
-			throw std::runtime_error("Error reading PE NT header");
-
-		m_PETimeStamp = header.FileHeader.TimeDateStamp;
-
-		if (header.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+		do
 		{
-			// Ignore this if it's powerPC because...xenon
-			// Detect if the executable/dll is actually a CLR assembly, which is not supported
-			if (header.FileHeader.Machine != 0x01F2 && header.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
-				throw std::runtime_error("The image is a CLR assembly, which is not supported");
+			IMAGE_DOS_HEADER dosHeader;
+			if (fread(&dosHeader, sizeof(IMAGE_DOS_HEADER), 1, exeFile) != 1)
+				throw std::runtime_error("Error reading PE header");
 
-			m_PESize = header.OptionalHeader.SizeOfImage;
-		}
-		else if (header.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
-		{
-			const IMAGE_NT_HEADERS32* header32 = (const IMAGE_NT_HEADERS32*)&header;
-			if (header32->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
-				throw std::runtime_error("The image is a CLR assembly, which is not supported");
+			if (dosHeader.e_magic != 23117 /* "PE\0\0" */)
+				throw std::runtime_error("Invalid PE header detected");
 
-			m_PESize = header32->OptionalHeader.SizeOfImage;
-		}
-		else
-			throw std::runtime_error("Unknown image format");
+			fseek(exeFile, dosHeader.e_lfanew, SEEK_SET);
 
-	} while(0);
+			IMAGE_NT_HEADERS64 header;
+			if (fread(&header, sizeof(IMAGE_NT_HEADERS64), 1, exeFile) != 1)
+				throw std::runtime_error("Error reading PE NT header");
 
-	fclose(exeFile);
+			m_PETimeStamp = header.FileHeader.TimeDateStamp;
+
+			if (header.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR64_MAGIC)
+			{
+				// Ignore this if it's powerPC because...xenon
+				// Detect if the executable/dll is actually a CLR assembly, which is not supported
+				if (header.FileHeader.Machine != 0x01F2 && header.OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
+					throw std::runtime_error("The image is a CLR assembly, which is not supported");
+
+				m_PESize = header.OptionalHeader.SizeOfImage;
+			}
+			else if (header.OptionalHeader.Magic == IMAGE_NT_OPTIONAL_HDR32_MAGIC)
+			{
+				const IMAGE_NT_HEADERS32* header32 = (const IMAGE_NT_HEADERS32*)&header;
+				if (header32->OptionalHeader.DataDirectory[IMAGE_DIRECTORY_ENTRY_COM_DESCRIPTOR].VirtualAddress != 0)
+					throw std::runtime_error("The image is a CLR assembly, which is not supported");
+
+				m_PESize = header32->OptionalHeader.SizeOfImage;
+			}
+			else
+				throw std::runtime_error("Unknown image format");
+
+			m_foundPE = true;
+		} while(0);
+
+		fclose(exeFile);
+        }
 }
 
 bool
@@ -1103,9 +1107,9 @@ PDBParser::printHeader(const DBIHeader* header, FILE* of, const char* platform)
 			m_guid.Data4[0], m_guid.Data4[1], m_guid.Data4[2], m_guid.Data4[3],
 			m_guid.Data4[4], m_guid.Data4[5], m_guid.Data4[6], m_guid.Data4[7],
 			header->age, m_filename.c_str());
-	
 
-	fprintf(of, "INFO CODE_ID %08X%X %s%s\n", m_PETimeStamp, m_PESize, m_filename.c_str(), m_isExe ? "exe" : "dll");
+	if (m_foundPE)
+		fprintf(of, "INFO CODE_ID %08X%X %s%s\n", m_PETimeStamp, m_PESize, m_filename.c_str(), m_isExe ? "exe" : "dll");
 }
 
 void
