@@ -1,4 +1,4 @@
-/* -*- Mode: C++; ; indent-tabs-mode: t; -*- */
+/* -*- Mode: C++; ; indent-tabs-mode: t; c-file-style: "linux" -*- */
 // Copyright (C) 2013 Jake Shadle
 //
 // Permission is hereby granted, free of charge, to any person obtaining
