@@ -1,3 +1,4 @@
+# -*- Mode: python; indent-tabs-mode: nil; -*-
 {
     'variables': {
         'have_tbb': '<!(! pkg-config --atleast-version=2.2 tbb; echo $?)',

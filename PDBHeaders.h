@@ -1,3 +1,4 @@
+/* -*- Mode: C++; ; indent-tabs-mode: t; -*- */
 // Copyright (C) 2013 Jake Shadle
 //
 // Permission is hereby granted, free of charge, to any person obtaining
