@@ -171,7 +171,7 @@ namespace google_breakpad
 			RESERVERD=5,    // All signatures from 5 to 64K are reserved
 		};
 	};
-	
+
 
 	//  CodeView Symbol and Type OMF type information is broken up into two
 	//  ranges.  Type indices less than 0x1000 describe type information
@@ -801,7 +801,7 @@ namespace google_breakpad
 
 	//  bit field structure describing class/struct/union/enum properties
 
-	struct CV_prop 
+	struct CV_prop
 	{
 		enum Enum
 		{

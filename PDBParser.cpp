@@ -495,7 +495,7 @@ PDBParser::load(const char* path)
 		} while(0);
 
 		fclose(exeFile);
-        }
+	}
 }
 
 bool
@@ -559,7 +559,7 @@ PDBParser::readRootStream()
 			}
 		} while (streamIndex < numStreams);
 	}
-	
+
 	// For each stream, get the list of page indices associated with each one,
 	// since any data associated with a stream are not necessarily adjacent
 	for (uint32_t i = 0; i < numStreams; ++i)
@@ -571,7 +571,7 @@ PDBParser::readRootStream()
 			m_streams[i].pageIndices.resize(numPages);
 
 			uint32_t numToCopy = numPages;
-			do 
+			do
 			{
 				uint32_t num = std::min(numToCopy, numItems - pageOffset);
 				memcpy(m_streams[i].pageIndices.data() + numPages - numToCopy, page + pageOffset, sizeof(uint32_t) * num);
@@ -644,7 +644,7 @@ PDBParser::readRootStream()
 			numOk--;
 		}
 	}
-	
+
 	return numOk == 0;
 }
 
@@ -716,7 +716,7 @@ PDBParser::loadTypeStream()
 	TypeMap map;
 	map.reserve(tih->max - tih->min);
 	uint32_t end = reader.getOffset();
-	
+
 	for (uint32_t i = tih->min; i < tih->max; ++i)
 	{
 		reader.seek(end);
@@ -882,7 +882,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 				+ header->fileInfoSize
 				+ header->srcModuleSize
 				+ header->ecInfoSize);
-	
+
 	auto debugHeader = reader.read<DBIDebugHeader>();
 
 	// Get the PE headers so that we can offset the functions to their correct
@@ -911,7 +911,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 	// Start printing the module files in a separate thread
 	Concurrency::task_group tg;
 	tg.run(
-               [this, &unique, &modules, &names, of, fileMod]() {
+	       [this, &unique, &modules, &names, of, fileMod]() {
 			loadNameStream(names);
 
 			auto end = names.map.end();
@@ -921,7 +921,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 				for (auto& kv : mod.srcIndex)
 				{
 					auto& us = unique.at(kv.second);
-					
+
 					if (!us.visited)
 					{
 						auto iter = names.map.find(kv.second);
@@ -950,7 +950,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 	// Check to see if we need to remap functions
 	if (debugHeader->tokenRidMap != 0 && debugHeader->tokenRidMap != 0xffff)
 		throw std::runtime_error("Implement me...");
-	
+
 	// Get functions from the global stream. These have mangled names that are useful.
 	Globals globals;
 	getGlobalFunctions(header->symRecordStream, sections, globals);
@@ -1014,7 +1014,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 			}
 		}
 	}
-	
+
 	// Wait for the type stream to be loaded, and all of the src files to be written
 	tg.wait();
 
@@ -1055,7 +1055,7 @@ PDBParser::readModule(const DBIModuleInfo* module, int32_t section, ModuleReadCB
 			continue;
 
 		uint32_t end = reader.getOffset() + header->size;
-		
+
 		if (!reader.isValidOffset(end))
 			throw std::runtime_error("Invalid subsection header detected");
 
@@ -1133,7 +1133,7 @@ PDBParser::getModuleFiles(const DBIModuleInfo* module, uint32_t& id, UniqueSrcFi
 		[module, &id, &unique, &fileIndices](StreamReader& reader, int32_t sig, uint32_t end)
 		{
 			uint32_t index = reader.getOffset();
-			
+
 			while (reader.getOffset() < end)
 			{
 				uint32_t msid = reader.getOffset() - index;
@@ -1256,7 +1256,7 @@ PDBParser::resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, c
 		[&funcs, &unique, &fileIndex](StreamReader& reader, int32_t sig, uint32_t end)
 		{
 			auto ls = reader.read<CV_LineSection>();
-			
+
 			size_t min = 0;
 			size_t max = funcs.size() - 1;
 			while (min < max)
@@ -1285,10 +1285,10 @@ PDBParser::resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, c
 
 			function.lineCount = srcfile->count;
 			function.lineOffset = ls->off;
-				
+
 			if (function.lineCount)
 				function.lines = reader.read<uint8_t>(srcfile->count * sizeof(CV_Line));
-			
+
 			// Mark that the function has been encountered
 			function.lineCount |= 0xF0000000;
 		});
@@ -1577,7 +1577,7 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 			output.append("!Unknown!", 9);
 			return false;
 		}
-		
+
 		// Check to see if it is a pointer type, thankfully the enum values are consistent
 		if (type & (0x0600 | 0x0400))
 			output.append(" *", 2);
@@ -1665,7 +1665,7 @@ PDBParser::stringizeType(uint32_t type, std::string& output, const TypeMap& tm, 
 					break;
 				}
 			}
-			
+
 			if (lp->attr & LeafPointerAttr::isconst)
 				output.append(" const", 6);
 
