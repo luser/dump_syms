@@ -138,6 +138,12 @@ namespace google_breakpad
 		int32_t cb;
 	};
 
+	struct Omap
+	{
+		uint32_t from;
+		uint32_t to;
+	};
+
 	struct TypeInfoHeader
 	{
 		uint32_t	version;

@@ -888,7 +888,15 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 	// Get the PE headers so that we can offset the functions to their correct
 	// addresses in the actual executable
 	std::vector<IMAGE_SECTION_HEADER> sections;
-	if (debugHeader->sectionHdr != 0xFFFF)
+	Omaps omaps;
+	if (debugHeader->sectionHdrOriginal != 0xFFFF &&
+		debugHeader->omapFromSource != 0xFFFF)
+	{
+		readSectionHeaders(debugHeader->sectionHdrOriginal, sections);
+		// read omap
+		readOmaps(debugHeader->omapFromSource, omaps);
+	}
+	else if (debugHeader->sectionHdr != 0xFFFF)
 	{
 		readSectionHeaders(debugHeader->sectionHdr, sections);
 	}
@@ -958,7 +966,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 	Functions functions;
 	for (auto& mod : modules)
 	{
-		getModuleFunctions(mod.info.data, functions);
+		getModuleFunctions(mod.info.data, omaps, functions);
 	}
 
 	Concurrency::parallel_sort(functions.begin(), functions.end());
@@ -1006,6 +1014,10 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 		if (func.segment == 0xffffffff)
 			continue;
 		func.offset += sections[func.segment - 1].VirtualAddress;
+		if (omaps.size())
+		{
+			remapFunction(omaps, func);
+		}
 		if (!updateParamSize(func, fpov2Data))
 		{
 			if (!updateParamSize(func, fpov1Data))
@@ -1127,6 +1139,20 @@ PDBParser::readSectionHeaders(uint32_t headerStream, SectionHeaders& headers)
 }
 
 void
+PDBParser::readOmaps(uint32_t omapStream, Omaps& omaps)
+{
+	auto& hs = getStream(omapStream);
+
+	StreamReader reader(hs, *this);
+
+	while (reader.getOffset() < hs.size)
+	{
+		auto sh = reader.read<Omap>();
+		omaps.push_back(*sh.data);
+	}
+}
+
+void
 PDBParser::getModuleFiles(const DBIModuleInfo* module, uint32_t& id, UniqueSrcFiles& unique, SrcFileIndex& fileIndices)
 {
 	readModule(module, Subsection::FileChecksums,
@@ -1158,7 +1184,7 @@ PDBParser::getModuleFiles(const DBIModuleInfo* module, uint32_t& id, UniqueSrcFi
 }
 
 void
-PDBParser::getModuleFunctions(const DBIModuleInfo* module, Functions& funcs)
+PDBParser::getModuleFunctions(const DBIModuleInfo* module, const Omaps& omaps, Functions& funcs)
 {
 	const StreamPair& pair = getStream(module->stream);
 
@@ -1218,6 +1244,19 @@ PDBParser::getModuleFunctions(const DBIModuleInfo* module, Functions& funcs)
 
 		// Mycket viktigt!
 		reader.seek(offsetBeg + header->size);
+	}
+}
+
+void
+PDBParser::remapFunction(const Omaps& omaps, FunctionRecord& rec)
+{
+	const auto& omap = std::lower_bound(omaps.begin(), omaps.end(), rec.offset,
+					    [](const Omap& omap, uint32_t offset) {
+						    return omap.from < offset;
+					    });
+	if (omap != omaps.end())
+	{
+		rec.offset = omap->to + rec.offset - omap->from;
 	}
 }
 

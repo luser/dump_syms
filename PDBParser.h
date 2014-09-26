@@ -287,6 +287,7 @@ private:
 	// If we decide to only support VC2013 we can use this.
 	//template<typename T>
 	//using FPODataMap = std::map<std::pair<uint32_t, uint32_t>, DataPtr<T>>;
+	typedef std::vector<Omap> Omaps;
 
 	struct NameStream
 	{
@@ -315,10 +316,12 @@ private:
 
 	void printHeader(const DBIHeader* header, FILE* of, const char* platform = nullptr);
 	void readSectionHeaders(uint32_t headerStream, SectionHeaders& headers);
+	void readOmaps(uint32_t omapStream, Omaps& omaps);
 	void getModuleFiles(const DBIModuleInfo* module, uint32_t& id, UniqueSrcFiles& unique, SrcFileIndex& fileIndex);
 	void printFiles(const SrcFileIndex& fileIndex, FILE* of);
-	void getModuleFunctions(const DBIModuleInfo* module, Functions& funcs);
-	void getGlobalFunctions(uint16_t symRecStream, const SectionHeaders& headers, Globals& globals);
+	void getModuleFunctions(const DBIModuleInfo* module, const Omaps& omaps, Functions& funcs);
+	void remapFunction(const Omaps& omaps, FunctionRecord& rec);
+  	void getGlobalFunctions(uint16_t symRecStream, const SectionHeaders& headers, Globals& globals);
 	void resolveFunctionLines(const DBIModuleInfo* module, Functions& funcs, const UniqueSrcFiles& unique, const SrcFileIndex& fileIndex);
 	void printFunctions(Functions& funcs, const TypeMap& tm, FILE* of);
 	template<typename T>
