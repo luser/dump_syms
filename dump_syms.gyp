@@ -1,7 +1,7 @@
 # -*- Mode: python; indent-tabs-mode: nil; -*-
 {
     'variables': {
-        'have_tbb': '<!(! pkg-config --atleast-version=2.2 tbb; echo $?)',
+        'have_tbb': '<!(python wrap-pkg-config.py --atleast-version=2.2 tbb)',
     },
     'targets': [
     {
