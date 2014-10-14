@@ -439,7 +439,7 @@ PDBParser::load(const char* path)
 		m_filename.erase(m_filename.size() - 3, 3);
 		m_filename += "dll";
 		if (fopen_s(&exeFile, m_filename.c_str(), "rb") != 0)
-			fprintf(stderr, "Failed to find paired exe/dll file");
+			fprintf(stderr, "Failed to find paired exe/dll file\n");
 
 		m_isExe = false;
 	}
