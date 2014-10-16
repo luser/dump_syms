@@ -654,7 +654,10 @@ PDBParser::loadNameStream(NameStream& names)
 {
 	auto nIter = m_nameIndices.find("/NAMES");
 	if (nIter == m_nameIndices.end())
-		throw std::runtime_error("Could not find /NAMES in name indices");
+	{
+		fprintf(stderr, "Warning: Could not find /NAMES stream\n");
+		return;
+	}
 
 	struct NameStreamHeader
 	{
