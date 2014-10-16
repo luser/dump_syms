@@ -616,13 +616,14 @@ PDBParser::readRootStream()
 
 		mapReader.seek(okOffset + (skip + 1) * sizeof(uint32_t));
 
-		uint32_t verification = *mapReader.read<uint32_t>().data;
-		if (verification != 0)
+		uint32_t deletedOffset = mapReader.getOffset();
+		uint32_t deletedskip = *mapReader.read<uint32_t>().data;
+		if (deletedskip != 0)
 		{
-			fprintf(stderr, "Invalid name index\n");
-			return false;
+			fprintf(stderr, "Warning: deleted names bitset is not empty, unsupported\n");
 		}
 
+		mapReader.seek(deletedOffset + (deletedskip +1) * sizeof(uint32_t));
 		struct StringVal
 		{
 			uint32_t id;
