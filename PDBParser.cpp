@@ -1015,7 +1015,7 @@ PDBParser::printBreakpadSymbols(FILE* of, const char* platform, FileMod* fileMod
 			}
 		}
 		// While here, see if this function uses C linkage
-		auto& g = globals.find(func.offset);
+		const auto& g = globals.find(func.offset);
 		if (g != globals.end() && g->second.data[0] != '?')
 		{
 			func.isExternC = true;
