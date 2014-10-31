@@ -439,7 +439,7 @@ PDBParser::load(const char* path)
 		m_filename.erase(m_filename.size() - 3, 3);
 		m_filename += "dll";
 		if (fopen_s(&exeFile, m_filename.c_str(), "rb") != 0)
-			fprintf(stderr, "Failed to find paired exe/dll file");
+			fprintf(stderr, "Failed to find paired exe/dll file\n");
 
 		m_isExe = false;
 	}
@@ -616,13 +616,14 @@ PDBParser::readRootStream()
 
 		mapReader.seek(okOffset + (skip + 1) * sizeof(uint32_t));
 
-		uint32_t verification = *mapReader.read<uint32_t>().data;
-		if (verification != 0)
+		uint32_t deletedOffset = mapReader.getOffset();
+		uint32_t deletedskip = *mapReader.read<uint32_t>().data;
+		if (deletedskip != 0)
 		{
-			fprintf(stderr, "Invalid name index\n");
-			return false;
+			fprintf(stderr, "Warning: deleted names bitset is not empty, unsupported\n");
 		}
 
+		mapReader.seek(deletedOffset + (deletedskip +1) * sizeof(uint32_t));
 		struct StringVal
 		{
 			uint32_t id;
@@ -653,7 +654,10 @@ PDBParser::loadNameStream(NameStream& names)
 {
 	auto nIter = m_nameIndices.find("/NAMES");
 	if (nIter == m_nameIndices.end())
-		throw std::runtime_error("Could not find /NAMES in name indices");
+	{
+		fprintf(stderr, "Warning: Could not find /NAMES stream\n");
+		return;
+	}
 
 	struct NameStreamHeader
 	{
