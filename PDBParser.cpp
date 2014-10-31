@@ -1241,7 +1241,7 @@ PDBParser::getGlobalFunctions(uint16_t symRecStream, const SectionHeaders& heade
 		{
 			auto rec = reader.read<GlobalRecord>();
 			if (rec->leafType == 0x1009)
-				throw std::exception("Global data_v2 records not handled!");
+				throw std::runtime_error("Global data_v2 records not handled!");
 			auto name = reader.read<char>(len - sizeof(GlobalRecord));
 
 			// Is function?
