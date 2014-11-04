@@ -27,7 +27,6 @@
 #include <assert.h>
 #include <algorithm>
 #ifdef _WIN32
-#include <atlfile.h>
 #include <ppl.h>
 #else
 #include <fcntl.h>
@@ -97,19 +96,22 @@ namespace google_breakpad
 bool MMapWrapper::Map(const char* path)
 {
 #ifdef _WIN32
-	CAtlFile file;
-	HRESULT result = file.Create(path, GENERIC_READ, FILE_SHARE_READ, OPEN_EXISTING);
-	if (FAILED(result))
+	HANDLE file = CreateFileA(path, GENERIC_READ, FILE_SHARE_READ, nullptr, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, nullptr);
+	if (file == INVALID_HANDLE_VALUE)
 		return false;
 
 	m_mapFile = CreateFileMappingA(file, NULL, PAGE_READONLY, 0, 0, 0);
 	if (m_mapFile == nullptr)
+	{
+		CloseHandle(file);
 		return false;
+	}
 
 	m_base = (const uint8_t*)MapViewOfFile(m_mapFile, FILE_MAP_READ, 0, 0, 0);
-
+	CloseHandle(file);
 	if (m_base == nullptr)
 		return false;
+
 #else // !_WIN32
 		int fd = open(path, O_RDONLY, 0);
 		if (fd == -1)
