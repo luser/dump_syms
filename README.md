@@ -1,6 +1,7 @@
 A reimplementation of the [Breakpad](https://code.google.com/p/google-breakpad/) Windows dump_syms tool.
 
 [![Build Status](https://travis-ci.org/luser/dump_syms.svg?branch=master)](https://travis-ci.org/luser/dump_syms)
+[![Build status](https://ci.appveyor.com/api/projects/status/n2rw0d06cpmwvupn/branch/master?svg=true)](https://ci.appveyor.com/project/luser/dump-syms/branch/master)
 
 Prerequisites
 =============
