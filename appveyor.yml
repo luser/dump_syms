@@ -1,8 +1,10 @@
-
+# Copied from https://github.com/springmeyer/hello-gyp/blob/master/appveyor.yml
 platform:
-  - x64
+#TODO: fix gyp file
+#  - x64
   - x86
 
+#TODO: fix gyp file
 #configuration:
 #  - Debug
 #  - Release
@@ -15,7 +17,7 @@ install:
   - python gyp/gyp_main.py dump_syms.gyp --depth=. -f msvs -G msvs_version=2013
   - set MSBUILD_PLATFORM=%platform%
   - if "%MSBUILD_PLATFORM%" == "x86" set MSBUILD_PLATFORM=Win32
-  - msbuild dump_syms.sln /clp:Verbosity=minimal /nologo /p:Configuration=Default;Platform=%MSBUILD_PLATFORM%
+  - msbuild dump_syms.sln /clp:Verbosity=minimal /nologo /p:Configuration=Default
 
 build: OFF
 
