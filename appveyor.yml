@@ -17,7 +17,7 @@ install:
   - python gyp/gyp_main.py dump_syms.gyp --depth=. -f msvs -G msvs_version=2013
   - set MSBUILD_PLATFORM=%platform%
   - if "%MSBUILD_PLATFORM%" == "x86" set MSBUILD_PLATFORM=Win32
-  - msbuild dump_syms.sln /clp:Verbosity=minimal /nologo /p:Configuration=Default
+  - msbuild dump_syms.sln /clp:Verbosity=minimal /nologo /p:Configuration=Default;Platform=%MSBUILD_PLATFORM%
 
 build: OFF
 
