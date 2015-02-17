@@ -3,22 +3,15 @@
     'variables': {
         'have_tbb': '<!(python wrap-pkg-config.py --atleast-version=2.2 tbb)',
     },
-    'targets': [
-    {
-        'target_name': 'dump_syms',
-        'type': 'executable',
-        'sources': [
-            'dump_syms.cpp',
-            'PDBParser.cpp',
-            'utils.cpp',
-        ],
-        'conditions': [
+    'target_defaults': {
+    'conditions': [
             ['OS=="win"', {
                 'msvs_settings': {
                     'VCCLCompilerTool': {
                         'ExceptionHandling': '1',
                         'WarnAsError': 'true',
                         'Optimization': '0',
+                        #'AdditionalOptions': ['/MP'],
                     },
                 },
             }, { # OS != "win"
@@ -40,7 +33,26 @@
                     'HAVE_TBB',
                 ],
             }],
-        ]
-    }
+    ]  # conditions
+    }, # target_defaults
+    'targets': [
+    {
+        'target_name': 'dump_syms',
+        'type': 'executable',
+        'sources': [
+            'dump_syms.cpp',
+        ],
+        'dependencies': [
+            'pdb_parser',
+        ],
+    },
+    {
+      'target_name': 'pdb_parser',
+      'type': 'static_library',
+      'sources': [
+            'PDBParser.cpp',
+            'utils.cpp',
+      ]
+    },
     ]
 }
