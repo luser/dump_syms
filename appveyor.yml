@@ -22,6 +22,7 @@ build_script:
   - if "%MSBUILD_PLATFORM%" == "x86" set MSBUILD_PLATFORM=Win32
   - msbuild dump_syms.sln /clp:Verbosity=minimal /nologo /p:Configuration=Default;Platform=%MSBUILD_PLATFORM%
 
-test: off
+test_script:
+  - .\Default\dump_syms_unittest.exe
 
 deploy: off

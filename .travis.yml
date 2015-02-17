@@ -11,6 +11,7 @@ before_install:
 script:
   - CXXFLAGS=-O2 gyp -f ninja --depth=. ./dump_syms.gyp
   - ninja -C out/Default
+  - out/Default/dump_syms_unittest
 os:
   - linux
 notifications:
