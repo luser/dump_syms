@@ -10,6 +10,7 @@ platform:
 #  - Release
 
 install:
+  - git submodule update --init --recursive
   - SET PATH=c:\python27;%PATH%
   - git clone --quiet --depth 1 https://chromium.googlesource.com/external/gyp.git gyp
   # note windows requires --generator-output to be absolute

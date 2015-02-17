@@ -13,13 +13,16 @@
                         'Optimization': '0',
                         #'AdditionalOptions': ['/MP'],
                     },
+                    'VCLinkerTool': {
+                        'SubSystem': '1',
+                    },
                 },
             }, { # OS != "win"
                 'cflags': [
                     '-g',
                     '-Wall',
                     '-Werror',
-                    '--std=c++0x',
+                    '-std=gnu++0x',
                 ],
             }],
             ['<(have_tbb)==1', {
@@ -53,6 +56,18 @@
             'PDBParser.cpp',
             'utils.cpp',
       ]
+    },
+    {
+      'target_name': 'dump_syms_unittest',
+      'type': 'executable',
+      'sources': [
+        'testing/dump_syms_unittest.cpp',
+      ],
+      'dependencies': [
+        '<(DEPTH)/testing/testing.gyp:gmock',
+        '<(DEPTH)/testing/testing.gyp:gtest',
+        'dump_syms',
+      ],
     },
     ]
 }
