@@ -1,0 +1,1231 @@
+MODULE windows x86 36AD3C9D54314027903A0E96A586A9BD8 TestApp.pdb
+FILE 1 C:\Users\TEDMIE~1\AppData\Local\Temp\lnk{C7B9AFC8-23E5-4AC0-B3C2-9C83F89DAC05}.tmp
+FILE 2 c:\program files (x86)\windows kits\8.0\include\um\mmiscapi2.h
+FILE 3 d:\code\testapp\testapp\stdafx.h
+FILE 4 c:\program files (x86)\windows kits\8.0\include\um\profileapi.h
+FILE 5 c:\program files (x86)\windows kits\8.0\include\um\winefs.h
+FILE 6 c:\program files (x86)\windows kits\8.0\include\um\synchapi.h
+FILE 7 c:\program files (x86)\windows kits\8.0\include\shared\inaddr.h
+FILE 8 c:\program files (x86)\microsoft visual studio 11.0\vc\include\crtdefs.h
+FILE 9 c:\program files (x86)\windows kits\8.0\include\um\mmsystem.h
+FILE 10 c:\program files (x86)\windows kits\8.0\include\um\mmsyscom.h
+FILE 11 c:\program files (x86)\windows kits\8.0\include\um\utilapiset.h
+FILE 12 c:\program files (x86)\windows kits\8.0\include\um\heapapi.h
+FILE 13 c:\program files (x86)\windows kits\8.0\include\um\processthreadsapi.h
+FILE 14 d:\code\testapp\testapp\testapp.cpp
+FILE 15 c:\program files (x86)\windows kits\8.0\include\shared\pshpack8.h
+FILE 16 c:\program files (x86)\windows kits\8.0\include\um\winnetwk.h
+FILE 17 c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdint.h
+FILE 18 c:\program files (x86)\windows kits\8.0\include\shared\wnnc.h
+FILE 19 c:\program files (x86)\windows kits\8.0\include\um\bemapiset.h
+FILE 20 c:\program files (x86)\windows kits\8.0\include\shared\rpcdcep.h
+FILE 21 c:\program files (x86)\windows kits\8.0\include\um\playsoundapi.h
+FILE 22 c:\program files (x86)\windows kits\8.0\include\um\oleidl.h
+FILE 23 c:\program files (x86)\windows kits\8.0\include\um\mcx.h
+FILE 24 c:\program files (x86)\windows kits\8.0\include\um\handleapi.h
+FILE 25 c:\program files (x86)\windows kits\8.0\include\um\threadpoolapiset.h
+FILE 26 c:\program files (x86)\windows kits\8.0\include\um\namespaceapi.h
+FILE 27 c:\program files (x86)\windows kits\8.0\include\shared\ktmtypes.h
+FILE 28 c:\program files (x86)\windows kits\8.0\include\um\objidl.h
+FILE 29 c:\program files (x86)\windows kits\8.0\include\um\msxml.h
+FILE 30 c:\program files (x86)\windows kits\8.0\include\shared\winsmcrd.h
+FILE 31 c:\program files (x86)\windows kits\8.0\include\um\winbase.h
+FILE 32 c:\program files (x86)\windows kits\8.0\include\um\wincon.h
+FILE 33 c:\program files (x86)\windows kits\8.0\include\um\mmiscapi.h
+FILE 34 c:\program files (x86)\windows kits\8.0\include\shared\apisetcconv.h
+FILE 35 c:\program files (x86)\windows kits\8.0\include\um\mmeapi.h
+FILE 36 c:\program files (x86)\windows kits\8.0\include\um\minwinbase.h
+FILE 37 c:\program files (x86)\windows kits\8.0\include\um\errhandlingapi.h
+FILE 38 c:\program files (x86)\windows kits\8.0\include\um\processenv.h
+FILE 39 c:\program files (x86)\windows kits\8.0\include\um\ime_cmodes.h
+FILE 40 c:\program files (x86)\windows kits\8.0\include\um\windows.h
+FILE 41 c:\program files (x86)\windows kits\8.0\include\shared\winapifamily.h
+FILE 42 c:\program files (x86)\windows kits\8.0\include\um\jobapi.h
+FILE 43 c:\program files (x86)\microsoft visual studio 11.0\vc\include\excpt.h
+FILE 44 c:\program files (x86)\windows kits\8.0\include\shared\apiset.h
+FILE 45 c:\program files (x86)\windows kits\8.0\include\um\ole2.h
+FILE 46 c:\program files (x86)\windows kits\8.0\include\um\systemtopologyapi.h
+FILE 47 c:\program files (x86)\windows kits\8.0\include\shared\pshpack1.h
+FILE 48 c:\program files (x86)\windows kits\8.0\include\um\objbase.h
+FILE 49 c:\program files (x86)\windows kits\8.0\include\um\wow64apiset.h
+FILE 50 c:\program files (x86)\windows kits\8.0\include\um\combaseapi.h
+FILE 51 c:\program files (x86)\windows kits\8.0\include\um\winnls.h
+FILE 52 c:\program files (x86)\windows kits\8.0\include\um\shellapi.h
+FILE 53 c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdlib.h
+FILE 54 c:\program files (x86)\windows kits\8.0\include\um\datetimeapi.h
+FILE 55 c:\program files (x86)\microsoft visual studio 11.0\vc\include\limits.h
+FILE 56 c:\program files (x86)\windows kits\8.0\include\um\processtopologyapi.h
+FILE 57 c:\program files (x86)\windows kits\8.0\include\shared\pshpack2.h
+FILE 58 c:\program files (x86)\windows kits\8.0\include\shared\guiddef.h
+FILE 59 c:\program files (x86)\windows kits\8.0\include\um\libloaderapi.h
+FILE 60 c:\program files (x86)\windows kits\8.0\include\um\sysinfoapi.h
+FILE 61 c:\program files (x86)\windows kits\8.0\include\um\winreg.h
+FILE 62 c:\program files (x86)\windows kits\8.0\include\um\ncrypt.h
+FILE 63 c:\program files (x86)\windows kits\8.0\include\um\objidlbase.h
+FILE 64 c:\program files (x86)\windows kits\8.0\include\um\winsock.h
+FILE 65 c:\program files (x86)\windows kits\8.0\include\um\nb30.h
+FILE 66 c:\program files (x86)\windows kits\8.0\include\um\unknwnbase.h
+FILE 67 c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdarg.h
+FILE 68 c:\program files (x86)\windows kits\8.0\include\um\oaidl.h
+FILE 69 c:\program files (x86)\windows kits\8.0\include\shared\windef.h
+FILE 70 c:\program files (x86)\windows kits\8.0\include\um\commdlg.h
+FILE 71 c:\program files (x86)\windows kits\8.0\include\shared\minwindef.h
+FILE 72 c:\program files (x86)\windows kits\8.0\include\um\timeapi.h
+FILE 73 c:\program files (x86)\windows kits\8.0\include\shared\specstrings.h
+FILE 74 c:\program files (x86)\windows kits\8.0\include\um\dpapi.h
+FILE 75 c:\program files (x86)\windows kits\8.0\include\shared\specstrings_strict.h
+FILE 76 c:\program files (x86)\windows kits\8.0\include\shared\specstrings_undef.h
+FILE 77 c:\program files (x86)\windows kits\8.0\include\um\securityappcontainer.h
+FILE 78 c:\program files (x86)\windows kits\8.0\include\um\propidl.h
+FILE 79 c:\program files (x86)\windows kits\8.0\include\shared\driverspecs.h
+FILE 80 c:\program files (x86)\windows kits\8.0\include\um\fibersapi.h
+FILE 81 c:\program files (x86)\windows kits\8.0\include\um\unknwn.h
+FILE 82 c:\program files (x86)\windows kits\8.0\include\shared\sdv_driverspecs.h
+FILE 83 c:\program files (x86)\windows kits\8.0\include\shared\kernelspecs.h
+FILE 84 c:\program files (x86)\windows kits\8.0\include\um\imm.h
+FILE 85 c:\program files (x86)\windows kits\8.0\include\shared\basetsd.h
+FILE 86 c:\program files (x86)\windows kits\8.0\include\um\winver.h
+FILE 87 c:\program files (x86)\windows kits\8.0\include\um\winscard.h
+FILE 88 c:\program files (x86)\windows kits\8.0\include\um\verrsrc.h
+FILE 89 c:\program files (x86)\windows kits\8.0\include\shared\wtypes.h
+FILE 90 c:\program files (x86)\windows kits\8.0\include\shared\rpcndr.h
+FILE 91 c:\program files (x86)\microsoft visual studio 11.0\vc\include\string.h
+FILE 92 c:\program files (x86)\windows kits\8.0\include\um\realtimeapiset.h
+FILE 93 c:\program files (x86)\windows kits\8.0\include\shared\tvout.h
+FILE 94 c:\program files (x86)\windows kits\8.0\include\um\rpcnsip.h
+FILE 95 c:\program files (x86)\windows kits\8.0\include\um\mciapi.h
+FILE 96 c:\program files (x86)\windows kits\8.0\include\um\winuser.h
+FILE 97 c:\program files (x86)\windows kits\8.0\include\shared\stralign.h
+FILE 98 c:\program files (x86)\windows kits\8.0\include\um\consoleapi.h
+FILE 99 c:\program files (x86)\windows kits\8.0\include\um\namedpipeapi.h
+FILE 100 c:\program files (x86)\windows kits\8.0\include\um\ioapiset.h
+FILE 101 c:\program files (x86)\windows kits\8.0\include\um\memoryapi.h
+FILE 102 c:\program files (x86)\windows kits\8.0\include\um\dlgs.h
+FILE 103 c:\program files (x86)\windows kits\8.0\include\um\winperf.h
+FILE 104 c:\program files (x86)\windows kits\8.0\include\um\winsvc.h
+FILE 105 c:\program files (x86)\windows kits\8.0\include\shared\pshpack4.h
+FILE 106 c:\program files (x86)\windows kits\8.0\include\um\wingdi.h
+FILE 107 c:\program files (x86)\windows kits\8.0\include\shared\rpc.h
+FILE 108 c:\program files (x86)\windows kits\8.0\include\um\joystickapi.h
+FILE 109 c:\program files (x86)\windows kits\8.0\include\um\urlmon.h
+FILE 110 c:\program files (x86)\windows kits\8.0\include\shared\rpcdce.h
+FILE 111 c:\program files (x86)\windows kits\8.0\include\shared\winerror.h
+FILE 112 c:\program files (x86)\windows kits\8.0\include\shared\bcrypt.h
+FILE 113 c:\program files (x86)\windows kits\8.0\include\um\ddeml.h
+FILE 114 c:\program files (x86)\windows kits\8.0\include\um\lzexpand.h
+FILE 115 c:\program files (x86)\windows kits\8.0\include\um\wincrypt.h
+FILE 116 c:\program files (x86)\windows kits\8.0\include\um\winnt.h
+FILE 117 c:\program files (x86)\windows kits\8.0\include\um\interlockedapi.h
+FILE 118 c:\program files (x86)\windows kits\8.0\include\um\timezoneapi.h
+FILE 119 c:\program files (x86)\windows kits\8.0\include\um\stringapiset.h
+FILE 120 c:\program files (x86)\windows kits\8.0\include\um\reason.h
+FILE 121 c:\program files (x86)\microsoft visual studio 11.0\vc\include\ctype.h
+FILE 122 c:\program files (x86)\windows kits\8.0\include\um\securitybaseapi.h
+FILE 123 c:\program files (x86)\windows kits\8.0\include\shared\rpcsal.h
+FILE 124 c:\program files (x86)\windows kits\8.0\include\um\winioctl.h
+FILE 125 d:\code\testapp\testapp\debug\testapp.pch
+FILE 126 c:\program files (x86)\windows kits\8.0\include\um\oleauto.h
+FILE 127 c:\program files (x86)\windows kits\8.0\include\um\debugapi.h
+FILE 128 c:\program files (x86)\windows kits\8.0\include\um\servprov.h
+FILE 129 c:\program files (x86)\windows kits\8.0\include\um\fileapi.h
+FILE 130 c:\program files (x86)\windows kits\8.0\include\shared\cderr.h
+FILE 131 c:\program files (x86)\windows kits\8.0\include\um\cguid.h
+FILE 132 c:\program files (x86)\windows kits\8.0\include\um\dde.h
+FILE 133 c:\program files (x86)\windows kits\8.0\include\shared\poppack.h
+FILE 134 c:\program files (x86)\windows kits\8.0\include\um\threadpoollegacyapiset.h
+FILE 135 c:\program files (x86)\windows kits\8.0\include\shared\rpcnterr.h
+FILE 136 c:\program files (x86)\windows kits\8.0\include\shared\wtypesbase.h
+FILE 137 c:\program files (x86)\windows kits\8.0\include\um\winspool.h
+FILE 138 c:\program files (x86)\windows kits\8.0\include\um\rpcnsi.h
+FILE 139 c:\program files (x86)\windows kits\8.0\include\shared\rpcasync.h
+FILE 140 c:\program files (x86)\windows kits\8.0\include\um\prsht.h
+FILE 142 d:\code\testapp\testapp\targetver.h
+FILE 143 c:\program files (x86)\windows kits\8.0\include\shared\sdkddkver.h
+FILE 144 c:\program files (x86)\microsoft visual studio 11.0\vc\include\stdio.h
+FILE 146 c:\program files (x86)\microsoft visual studio 11.0\vc\include\sal.h
+FILE 147 c:\program files (x86)\microsoft visual studio 11.0\vc\include\concurrencysal.h
+FILE 148 c:\program files (x86)\microsoft visual studio 11.0\vc\include\vadefs.h
+FILE 149 c:\program files (x86)\microsoft visual studio 11.0\vc\include\tchar.h
+FILE 150 c:\program files (x86)\microsoft visual studio 11.0\vc\include\wchar.h
+FILE 151 c:\program files (x86)\microsoft visual studio 11.0\vc\include\swprintf.inl
+FILE 152 d:\code\testapp\testapp\stdafx.cpp
+FILE 153 c:\program files (x86)\microsoft visual studio 11.0\vc\include\wtime.inl
+FILE 155 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\ehassert.h
+FILE 156 f:\dd\public\sdk\inc\synchapi.h
+FILE 157 f:\dd\public\sdk\inc\heapapi.h
+FILE 158 f:\dd\public\sdk\inc\utilapiset.h
+FILE 159 f:\dd\public\sdk\inc\fileapi.h
+FILE 160 f:\dd\public\devdiv\inc\ddbanned.h
+FILE 161 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\vadefs.h
+FILE 162 f:\dd\public\sdk\inc\stralign.h
+FILE 163 f:\dd\public\sdk\inc\stringapiset.h
+FILE 164 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\cruntime.h
+FILE 165 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\sal.h
+FILE 166 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\concurrencysal.h
+FILE 167 f:\dd\public\sdk\inc\mcx.h
+FILE 168 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\awint.h
+FILE 169 f:\dd\public\sdk\inc\handleapi.h
+FILE 170 f:\dd\public\sdk\inc\sysinfoapi.h
+FILE 171 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\stdlib.h
+FILE 172 f:\dd\public\sdk\inc\securitybaseapi.h
+FILE 173 f:\dd\public\sdk\inc\wingdi.h
+FILE 174 f:\dd\public\sdk\inc\winnetwk.h
+FILE 175 f:\dd\public\sdk\inc\wnnc.h
+FILE 176 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\crtdbg.h
+FILE 177 f:\dd\public\sdk\inc\ime_cmodes.h
+FILE 178 f:\dd\public\sdk\inc\namespaceapi.h
+FILE 179 f:\dd\public\sdk\inc\pshpack4.h
+FILE 180 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\eh\unhandld.cpp
+FILE 181 f:\dd\vctools\langapi\include\ehdata.h
+FILE 182 f:\dd\public\sdk\inc\errhandlingapi.h
+FILE 183 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\stddef.h
+FILE 184 f:\dd\vctools\langapi\include\isa_availability.h
+FILE 185 f:\dd\public\sdk\inc\memoryapi.h
+FILE 186 f:\dd\public\sdk\inc\threadpoollegacyapiset.h
+FILE 187 f:\dd\public\sdk\inc\wincon.h
+FILE 188 f:\dd\public\sdk\inc\systemtopologyapi.h
+FILE 189 f:\dd\public\sdk\inc\pshpack8.h
+FILE 190 f:\dd\public\sdk\inc\winerror.h
+FILE 191 f:\dd\public\sdk\inc\winbase.h
+FILE 192 f:\dd\public\sdk\inc\processtopologyapi.h
+FILE 193 f:\dd\public\sdk\inc\securityappcontainer.h
+FILE 194 f:\dd\public\sdk\inc\apisetcconv.h
+FILE 195 f:\dd\public\sdk\inc\realtimeapiset.h
+FILE 196 f:\dd\public\sdk\inc\processenv.h
+FILE 197 f:\dd\public\sdk\inc\minwinbase.h
+FILE 198 f:\dd\public\sdk\inc\ktmtypes.h
+FILE 199 f:\dd\public\sdk\inc\timezoneapi.h
+FILE 200 f:\dd\public\sdk\inc\imm.h
+FILE 201 f:\dd\public\sdk\inc\fibersapi.h
+FILE 202 f:\dd\public\sdk\inc\guiddef.h
+FILE 203 f:\dd\public\sdk\inc\poppack.h
+FILE 204 f:\dd\public\sdk\inc\tvout.h
+FILE 205 f:\dd\public\sdk\inc\bemapiset.h
+FILE 206 f:\dd\public\sdk\inc\winreg.h
+FILE 207 f:\dd\public\sdk\inc\threadpoolapiset.h
+FILE 208 f:\dd\public\sdk\inc\ioapiset.h
+FILE 209 f:\dd\public\sdk\inc\namedpipeapi.h
+FILE 210 f:\dd\public\sdk\inc\kernelspecs.h
+FILE 211 f:\dd\public\sdk\inc\basetsd.h
+FILE 212 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\stdarg.h
+FILE 213 f:\dd\public\sdk\inc\windef.h
+FILE 214 f:\dd\public\sdk\inc\apiset.h
+FILE 215 f:\dd\public\sdk\inc\minwindef.h
+FILE 216 f:\dd\public\sdk\inc\specstrings.h
+FILE 217 f:\dd\public\sdk\inc\winnls.h
+FILE 218 f:\dd\public\sdk\inc\specstrings_strict.h
+FILE 219 f:\dd\public\sdk\inc\windows.h
+FILE 220 f:\dd\public\sdk\inc\datetimeapi.h
+FILE 221 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\string.h
+FILE 222 f:\dd\public\sdk\inc\specstrings_undef.h
+FILE 223 f:\dd\public\sdk\inc\winapifamily.h
+FILE 224 f:\dd\public\sdk\inc\driverspecs.h
+FILE 225 f:\dd\public\sdk\inc\sdkddkver.h
+FILE 226 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\internal.h
+FILE 227 f:\dd\public\sdk\inc\interlockedapi.h
+FILE 228 f:\dd\public\sdk\inc\sdv_driverspecs.h
+FILE 229 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\excpt.h
+FILE 230 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\limits.h
+FILE 231 f:\dd\public\sdk\inc\winver.h
+FILE 232 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\crtdefs.h
+FILE 233 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\mtdll.h
+FILE 234 f:\dd\public\sdk\inc\verrsrc.h
+FILE 235 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\sect_attribs.h
+FILE 236 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\eh.h
+FILE 237 f:\dd\public\sdk\inc\pshpack2.h
+FILE 238 f:\dd\public\sdk\inc\jobapi.h
+FILE 239 f:\dd\public\sdk\inc\consoleapi.h
+FILE 240 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\errno.h
+FILE 241 f:\dd\public\sdk\inc\wow64apiset.h
+FILE 242 f:\dd\public\sdk\inc\libloaderapi.h
+FILE 243 f:\dd\public\sdk\inc\debugapi.h
+FILE 244 f:\dd\public\sdk\inc\winuser.h
+FILE 245 f:\dd\public\sdk\inc\pshpack1.h
+FILE 246 f:\dd\public\sdk\inc\reason.h
+FILE 247 f:\dd\public\sdk\inc\processthreadsapi.h
+FILE 248 f:\dd\public\sdk\inc\winnt.h
+FILE 249 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\ehhooks.h
+FILE 250 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\ctype.h
+FILE 251 f:\dd\public\sdk\inc\profileapi.h
+FILE 252 f:\dd\vctools\crt_bld\self_x86\crt\src\oscalls.h
+FILE 253 f:\dd\vctools\crt_bld\self_x86\crt\src\crtdefs.h
+FILE 259 f:\dd\vctools\crt_bld\self_x86\crt\src\rterr.h
+FILE 260 f:\dd\vctools\crt_bld\self_x86\crt\src\sect_attribs.h
+FILE 278 f:\dd\vctools\crt_bld\self_x86\crt\src\vadefs.h
+FILE 279 f:\dd\vctools\crt_bld\self_x86\crt\src\ctype.h
+FILE 280 f:\dd\vctools\crt_bld\self_x86\crt\src\cruntime.h
+FILE 281 f:\dd\vctools\crt_bld\self_x86\crt\src\stdlib.h
+FILE 282 f:\dd\vctools\crt_bld\self_x86\crt\src\sal.h
+FILE 284 f:\dd\vctools\crt_bld\self_x86\crt\src\concurrencysal.h
+FILE 289 f:\dd\vctools\crt_bld\self_x86\crt\src\string.h
+FILE 297 f:\dd\vctools\crt_bld\self_x86\crt\src\dbgint.h
+FILE 313 f:\dd\vctools\crt_bld\self_x86\crt\src\excpt.h
+FILE 314 f:\dd\vctools\crt_bld\self_x86\crt\src\errno.h
+FILE 324 f:\dd\vctools\crt_bld\self_x86\crt\src\internal.h
+FILE 325 f:\dd\vctools\crt_bld\self_x86\crt\src\limits.h
+FILE 326 f:\dd\vctools\crt_bld\self_x86\crt\src\mtdll.h
+FILE 330 f:\dd\vctools\crt_bld\self_x86\crt\src\crtdbg.h
+FILE 332 f:\dd\vctools\crt_bld\self_x86\crt\src\atonexit.c
+FILE 333 f:\dd\vctools\crt_bld\self_x86\crt\src\stdarg.h
+FILE 346 f:\dd\vctools\crt_bld\self_x86\crt\src\stdio.h
+FILE 371 f:\dd\vctools\crt_bld\self_x86\crt\src\swprintf.inl
+FILE 423 f:\dd\vctools\crt_bld\self_x86\crt\src\cinitexe.c
+FILE 513 f:\dd\vctools\crt_bld\self_x86\crt\src\gs_cookie.c
+FILE 598 f:\dd\vctools\crt_bld\self_x86\crt\src\gs_report.c
+FILE 602 f:\dd\vctools\crt_bld\self_x86\crt\src\awint.h
+FILE 607 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\emmintrin.h
+FILE 611 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\xmmintrin.h
+FILE 613 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\mmintrin.h
+FILE 645 f:\dd\vctools\crt_bld\self_x86\crt\src\cmsgs.h
+FILE 654 f:\dd\vctools\crt_bld\self_x86\crt\src\malloc.h
+FILE 658 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\ammintrin.h
+FILE 667 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\mm3dnow.h
+FILE 671 f:\dd\vctools\crt_bld\self_x86\crt\src\intrin.h
+FILE 672 f:\dd\vctools\crt_bld\self_x86\crt\src\setjmp.h
+FILE 687 f:\dd\vctools\crt_bld\self_x86\crt\src\stddef.h
+FILE 693 f:\dd\vctools\crt_bld\self_x86\crt\src\gs_support.c
+FILE 699 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\immintrin.h
+FILE 700 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\wmmintrin.h
+FILE 701 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\nmmintrin.h
+FILE 704 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\smmintrin.h
+FILE 705 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\tmmintrin.h
+FILE 706 f:\binaries.x86ret\interapiscandidates\vctools\inc\vc\pmmintrin.h
+FILE 711 f:\dd\vctools\crt_bld\self_x86\crt\src\math.h
+FILE 786 f:\dd\vctools\crt_bld\self_x86\crt\src\merr.c
+FILE 875 f:\dd\vctools\crt_bld\self_x86\crt\src\natstart.c
+FILE 961 f:\dd\vctools\crt_bld\self_x86\crt\src\pesect.c
+FILE 969 f:\dd\vctools\crt_bld\self_x86\crt\src\crtexe.c
+FILE 971 f:\dd\vctools\crt_bld\self_x86\crt\src\tchar.h
+FILE 973 f:\dd\vctools\crt_bld\self_x86\crt\src\wchar.h
+FILE 1007 f:\dd\vctools\crt_bld\self_x86\crt\src\locale.h
+FILE 1046 f:\dd\vctools\crt_bld\self_x86\crt\src\process.h
+FILE 1048 f:\dd\vctools\crt_bld\self_x86\crt\src\wtime.inl
+FILE 1056 f:\dd\vctools\crt_bld\self_x86\crt\src\wcrtexe.c
+FILE 1069 f:\dd\vctools\crt_bld\self_x86\crt\src\rtcapi.h
+FILE 1074 f:\dd\vctools\crt_bld\self_x86\crt\src\dllargv.c
+FILE 1151 f:\dd\vctools\crt_bld\self_x86\crt\src\wdllargv.c
+FILE 1240 f:\dd\vctools\crt_bld\self_x86\crt\src\wildcard.c
+FILE 1307 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\process.h
+FILE 1327 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\misc\i386\chandler4gs.c
+FILE 1382 f:\dd\vctools\crt_bld\self_x86\crt\src\float.h
+FILE 1384 f:\dd\vctools\crt_bld\self_x86\crt\src\crtwrn.h
+FILE 1418 f:\dd\vctools\crt_bld\self_x86\crt\src\intel\fp8.c
+FILE 1502 f:\dd\vctools\crt_bld\self_x86\crt\src\intel\loadcfg.c
+FILE 1586 f:\dd\vctools\crt_bld\self_x86\crt\src\intel\secchk.c
+FILE 1672 f:\dd\vctools\crt_bld\self_x86\crt\src\_newmode.c
+FILE 1761 f:\dd\vctools\crt_bld\self_x86\crt\src\xncommod.c
+FILE 1780 f:\dd\vctools\crt_bld\self_x86\crt\src\xtxtmode.c
+FILE 1840 f:\dd\vctools\crt_bld\self_x86\crt\src\setlocal.h
+FILE 1862 f:\dd\vctools\crt_bld\self_x86\crt\src\xthdloc.c
+FILE 1884 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\rtcapi.h
+FILE 1892 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\userapi.cpp
+FILE 1896 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\malloc.h
+FILE 1934 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\h\rtcpriv.h
+FILE 1978 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\stack.cpp
+FILE 2046 f:\dd\vctools\langapi\include\verstamp.h
+FILE 2047 f:\dd\vctools\langapi\include\version.h
+FILE 2049 f:\binaries.x86ret\version\vsversion_generated.h
+FILE 2054 f:\binaries.x86ret\version\buildnumber.h
+FILE 2056 f:\dd\vctools\langapi\include\bld_version.h
+FILE 2059 f:\dd\internalapis\vscommon\inc\vsverstrings.h
+FILE 2060 f:\dd\internalapis\config\inc\brandnames.h
+FILE 2062 f:\dd\vctools\langapi\include\pdb.h
+FILE 2064 f:\dd\vctools\langapi\include\vcver.h
+FILE 2071 f:\dd\vctools\langapi\include\cvinfo.h
+FILE 2072 f:\dd\vctools\langapi\include\cvconst.h
+FILE 2075 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\pdblkup.cpp
+FILE 2163 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\initsect.cpp
+FILE 2256 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\init.cpp
+FILE 2342 f:\dd\vctools\crt_bld\self_x86\crt\prebuild\rtc\error.cpp
+FUNC 11420 42 10 test2(unsigned long,unsigned int,unsigned short,unsigned char)
+11420 1e 14 14
+1143e 10 15 14
+1144e 14 16 14
+PUBLIC 11464 0 printf
+FUNC 11480 42 14 test3(unsigned __int64,unsigned int,unsigned short,unsigned char)
+11480 1e 19 14
+1149e 10 20 14
+114ae 14 21 14
+FUNC 114e0 44 14 test4(__int64,int,short,signed char)
+114e0 1e 24 14
+114fe 12 25 14
+11510 14 26 14
+FUNC 11540 44 14 test5(bool,long,void *,char *,char const *)
+11540 1e 29 14
+1155e 12 30 14
+11570 14 31 14
+FUNC 115a0 25 14 test6(float,double,double)
+115a0 1e 34 14
+115be 7 35 14
+FUNC 11600 32 4 _RTC_AllocaHelper(_RTC_ALLOCA_NODE *,unsigned int,_RTC_ALLOCA_NODE * *)
+11600 9 103 1978
+11609 f 106 1978
+11618 9 111 1978
+11621 5 124 1978
+11626 3 125 1978
+11629 5 129 1978
+1162e 4 130 1978
+FUNC 11640 d1 4 _RTC_CheckStackVars2(void *,_RTC_framedesc *,_RTC_ALLOCA_NODE *)
+11640 c 138 1978
+1164c 4 141 1978
+11650 10 143 1978
+11660 3 146 1978
+11663 10 148 1978
+11673 6 145 1978
+11679 c 148 1978
+11685 10 149 1978
+11695 8 143 1978
+1169d 3 155 1978
+116a0 4 156 1978
+116a4 4 157 1978
+116a8 8 160 1978
+116b0 4 164 1978
+116b4 23 171 1978
+116d7 e 173 1978
+116e5 d 180 1978
+116f2 e 181 1978
+11700 3 184 1978
+11703 8 185 1978
+1170b 6 187 1978
+FUNC 11750 58 0 _RTC_CheckStackVars(void *,_RTC_framedesc *)
+11750 8 77 1978
+11758 c 79 1978
+11764 3 82 1978
+11767 10 84 1978
+11777 6 81 1978
+1177d c 84 1978
+11789 10 85 1978
+11799 b 79 1978
+117a4 4 87 1978
+FUNC 117c0 25 0 _RTC_CheckEsp()
+117c0 0 31 1978
+117c0 2 34 1978
+117c2 1 35 1978
+117c3 1 40 1978
+117c4 2 41 1978
+117c6 3 42 1978
+117c9 1 44 1978
+117ca 1 45 1978
+117cb 1 47 1978
+117cc 1 48 1978
+117cd 1 49 1978
+117ce e 52 1978
+117dc 1 58 1978
+117dd 1 59 1978
+117de 1 60 1978
+117df 1 62 1978
+117e0 1 63 1978
+117e1 2 65 1978
+117e3 1 66 1978
+117e4 1 67 1978
+FUNC 117f0 29 0 _RTC_InitBase()
+117f0 0 97 2256
+117f0 9 99 2256
+117f9 1f 102 2256
+11818 1 103 2256
+FUNC 11830 13 0 _RTC_Shutdown()
+11830 0 107 2256
+11830 12 108 2256
+11842 1 109 2256
+FUNC 11850 88 0 pre_c_init()
+11850 3 204 969
+11853 a 208 969
+1185d b 216 969
+11868 17 224 969
+1187f e 229 969
+1188d d 230 969
+1189a 5 236 969
+1189f 5 245 969
+118a4 9 254 969
+118ad e 255 969
+118bb 5 258 969
+118c0 9 262 969
+118c9 b 264 969
+118d4 2 267 969
+118d6 2 268 969
+FUNC 11900 58 0 pre_cpp_init()
+11900 3 285 969
+11903 d 287 969
+11910 a 297 969
+1191a 29 301 969
+11943 9 308 969
+1194c a 309 969
+11956 2 311 969
+FUNC 11970 b 0 NtCurrentTeb()
+11970 b 18862 248
+FUNC 11980 237 0 __tmainCRTStartup()
+11980 33 384 969
+119b3 7 398 969
+119ba 7 422 969
+119c1 b 423 969
+119cc 7 424 969
+119d3 17 425 969
+119ea 8 427 969
+119f2 7 429 969
+119f9 2 430 969
+119fb 2 432 969
+119fd 9 434 969
+11a06 c 436 969
+11a12 9 438 969
+11a1b a 440 969
+11a25 16 442 969
+11a3b 16 444 969
+11a51 2 450 969
+11a53 a 452 969
+11a5d 9 458 969
+11a66 12 460 969
+11a78 a 461 969
+11a82 30 463 969
+11ab2 6 464 969
+11ab8 9 466 969
+11ac1 1a 476 969
+11adb c 478 969
+11ae7 b 482 969
+11af2 e 532 969
+11b00 21 533 969
+11b21 9 546 969
+11b2a c 547 969
+11b36 9 549 969
+11b3f 6 550 969
+11b45 9 552 969
+11b4e 1e 553 969
+11b6c 8 559 969
+11b74 9 566 969
+11b7d d 567 969
+11b8a 9 569 969
+11b93 6 570 969
+11b99 7 571 969
+11ba0 5 573 969
+11ba5 12 574 969
+FUNC 11bc0 25 10 test7(signed char,wchar_t,wchar_t *,char * *)
+11bc0 1e 38 14
+11bde 7 39 14
+FUNC 11bf0 49 8 testC(int,short)
+11bf0 1e 42 14
+11c0e 17 43 14
+11c25 14 44 14
+FUNC 11c50 82 0 check_managed_app()
+11c50 6 597 969
+11c56 7 601 969
+11c5d e 603 969
+11c6b 4 605 969
+11c6f c 608 969
+11c7b b 610 969
+11c86 4 612 969
+11c8a e 615 969
+11c98 4 617 969
+11c9c 9 623 969
+11ca5 4 625 969
+11ca9 25 629 969
+11cce 4 630 969
+FUNC 11d00 f 0 wmainCRTStartup()
+11d00 3 367 969
+11d03 5 374 969
+11d08 5 376 969
+11d0d 2 377 969
+FUNC 11d20 99 4 DebuggerProbe(unsigned long)
+11d20 33 121 2342
+11d53 4 122 2342
+11d57 7 125 2342
+11d5e 6 126 2342
+11d64 6 127 2342
+11d6a 7 129 2342
+11d71 13 131 2342
+11d84 2 132 2342
+11d86 16 133 2342
+11d9c 7 137 2342
+11da3 4 139 2342
+11da7 12 140 2342
+FUNC 11de0 ab 10 DebuggerRuntime(unsigned long,int,void *,wchar_t const *)
+11de0 33 145 2342
+11e13 4 147 2342
+11e17 7 149 2342
+11e1e 6 150 2342
+11e24 6 151 2342
+11e2a 6 152 2342
+11e30 6 153 2342
+11e36 6 154 2342
+11e3c 7 156 2342
+11e43 13 158 2342
+11e56 2 159 2342
+11e58 16 160 2342
+11e6e 7 164 2342
+11e75 4 166 2342
+11e79 12 167 2342
+FUNC 11ec0 168 c _RTC_AllocaFailure(void *,_RTC_ALLOCA_NODE *,int)
+11ec0 1b 399 2342
+11edb c 400 2342
+11ee7 9 402 2342
+11ef0 15 405 2342
+11f05 13 407 2342
+11f18 d 411 2342
+11f25 8 414 2342
+11f2d 14 416 2342
+11f41 18 418 2342
+11f59 35 462 2342
+11f8e 18 465 2342
+11fa6 32 467 2342
+11fd8 1b 471 2342
+11ff3 e 474 2342
+12001 17 424 2342
+12018 10 474 2342
+FUNC 12030 49 10 test1(long,int,short,char)
+12030 1e 9 14
+1204e 17 10 14
+12065 14 11 14
+FUNC 12090 4e 8 _RTC_Failure(void *,int)
+12090 3 255 2342
+12093 8 259 2342
+1209b 7 260 2342
+120a2 7 261 2342
+120a9 5 270 2342
+120ae e 272 2342
+120bc 2 274 2342
+120be 6 264 2342
+120c4 18 272 2342
+120dc 2 274 2342
+FUNC 12100 f9 8 _RTC_StackFailure(void *,char const *)
+12100 13 339 2342
+12113 19 341 2342
+1212c 27 346 2342
+12153 6 352 2342
+12159 1b 353 2342
+12174 27 354 2342
+1219b 32 355 2342
+121cd 5 348 2342
+121d2 19 357 2342
+121eb e 359 2342
+FUNC 12240 68 10 _getMemBlockDataString(char *,char *,char *,unsigned int)
+12240 4 377 2342
+12244 27 381 2342
+1226b 3 383 2342
+1226e 19 385 2342
+12287 9 389 2342
+12290 8 391 2342
+12298 c 392 2342
+122a4 4 393 2342
+FUNC 122d0 1ef 10 failwithmessage(void *,int,int,char const *)
+122d0 1f 171 2342
+122ef 21 179 2342
+12310 4 181 2342
+12314 f 186 2342
+12323 16 189 2342
+12339 7 190 2342
+12340 19 192 2342
+12359 a 194 2342
+12363 5 199 2342
+12368 11 204 2342
+12379 20 206 2342
+12399 2 208 2342
+1239b 2 210 2342
+1239d 2 211 2342
+1239f 23 213 2342
+123c2 2b 220 2342
+123ed 4 223 2342
+123f1 25 226 2342
+12416 5 229 2342
+1241b 31 234 2342
+1244c 6 236 2342
+12452 2b 241 2342
+1247d 6 243 2342
+12483 2a 247 2342
+124ad 1 248 2342
+124ae 11 251 2342
+FUNC 124c0 46 8 wmain(int,wchar_t * *)
+124c0 1e 47 14
+124de 12 48 14
+124f0 2 49 14
+124f2 14 50 14
+FUNC 12540 f7 4 _RTC_UninitUse(char const *)
+12540 13 481 2342
+12553 10 483 2342
+12563 26 487 2342
+12589 6 493 2342
+1258f 25 494 2342
+125b4 27 495 2342
+125db 32 496 2342
+1260d 5 489 2342
+12612 17 499 2342
+12629 e 501 2342
+FUNC 12680 6 4 _RTC_GetErrorFunc(void const *)
+12680 0 93 1892
+12680 5 104 1892
+12685 1 105 1892
+FUNC 12690 6 4 _RTC_GetErrorFuncW(void const *)
+12690 0 109 1892
+12690 5 110 1892
+12695 1 111 1892
+FUNC 126a0 18 4 _RTC_GetErrDesc(_RTC_ErrorNumber)
+126a0 3 50 1892
+126a3 8 51 1892
+126ab 7 53 1892
+126b2 2 54 1892
+126b4 2 52 1892
+126b6 2 54 1892
+FUNC 126c0 6 0 _RTC_NumErrors()
+126c0 0 44 1892
+126c0 5 45 1892
+126c5 1 46 1892
+FUNC 126d0 1d 4 _RTC_SetErrorFunc((int,char const *,int,char const *,char const *,...))
+126d0 3 71 1892
+126d3 e 75 1892
+126e1 a 76 1892
+126eb 2 78 1892
+FUNC 12700 1d 4 _RTC_SetErrorFuncW((int,wchar_t const *,int,wchar_t const *,wchar_t const *,...))
+12700 3 82 1892
+12703 e 86 1892
+12711 a 87 1892
+1271b 2 89 1892
+FUNC 12730 23 8 _RTC_SetErrorType(_RTC_ErrorNumber,int)
+12730 3 58 1892
+12733 8 59 1892
+1273b 11 62 1892
+1274c 2 66 1892
+1274e 3 65 1892
+12751 2 66 1892
+PUBLIC 1275c 0 _CRT_RTC_INITW
+FUNC 12770 65 4 __CxxUnhandledExceptionFilter(_EXCEPTION_POINTERS *)
+12770 3 37 180
+12773 50 38 180
+127c3 5 39 180
+127c8 7 40 180
+127cf 2 42 180
+127d1 4 43 180
+FUNC 127f0 14 0 __CxxSetUnhandledExceptionFilter()
+127f0 3 56 180
+127f3 d 59 180
+12800 2 60 180
+12802 2 61 180
+PUBLIC 1280a 0 _XcptFilter
+PUBLIC 12810 0 _amsg_exit
+FUNC 12820 7 0 _wsetargv()
+12820 3 56 1074
+12823 2 57 1074
+12825 2 58 1074
+PUBLIC 12828 0 __wgetmainargs
+PUBLIC 1282e 0 __set_app_type
+PUBLIC 12834 0 _CrtDbgReportW
+PUBLIC 1283a 0 _CrtSetCheckCount
+FUNC 12840 73 8 _FindPESection(unsigned char *,unsigned long)
+12840 6 86 961
+12846 c 93 961
+12852 38 102 961
+1288a 1c 105 961
+128a6 5 110 961
+128ab 2 112 961
+128ad 2 117 961
+128af 4 118 961
+FUNC 128d0 12b 4 _IsNonwritableInCurrentImage(unsigned char *)
+128d0 33 143 961
+12903 7 148 961
+1290a 7 150 961
+12911 10 158 961
+12921 16 160 961
+12937 9 168 961
+12940 13 169 961
+12953 6 170 961
+12959 13 172 961
+1296c 30 179 961
+1299c 9 180 961
+129a5 2a 181 961
+129cf 13 187 961
+129e2 7 188 961
+129e9 12 189 961
+FUNC 12a50 5d 4 _ValidateImageBase(unsigned char *)
+12a50 6 38 961
+12a56 6 43 961
+12a5c e 44 961
+12a6a 4 46 961
+12a6e c 49 961
+12a7a b 50 961
+12a85 4 52 961
+12a89 9 55 961
+12a92 e 56 961
+12aa0 4 58 961
+12aa4 5 61 961
+12aa9 4 62 961
+PUBLIC 12ac4 0 exit
+PUBLIC 12aca 0 _exit
+PUBLIC 12ad0 0 _cexit
+FUNC 12ae0 dd 0 __security_init_cookie()
+12ae0 6 82 693
+12ae6 e 84 693
+12af4 18 99 693
+12b0c e 101 693
+12b1a 5 102 693
+12b1f a 112 693
+12b29 6 116 693
+12b2f 9 117 693
+12b38 c 120 693
+12b44 c 121 693
+12b50 a 130 693
+12b5a 9 134 693
+12b63 9 135 693
+12b6c b 141 693
+12b77 9 157 693
+12b80 9 159 693
+12b89 b 162 693
+12b94 12 164 693
+12ba6 8 168 693
+12bae b 169 693
+12bb9 4 171 693
+FUNC 12c00 7 4 _matherr(_exception *)
+12c00 3 37 786
+12c03 2 38 786
+12c05 2 39 786
+FUNC 12c10 a9 0 __atonexitinit()
+12c10 4 63 332
+12c14 48 69 332
+12c5c 9 73 332
+12c65 4 74 332
+12c69 19 77 332
+12c82 1b 78 332
+12c9d 6 80 332
+12ca3 7 85 332
+12caa 9 87 332
+12cb3 2 89 332
+12cb5 4 90 332
+FUNC 12cf0 f1 4 _onexit(())
+12cf0 30 127 332
+12d20 f 132 332
+12d2f 6 134 332
+12d35 12 138 332
+12d47 a 151 332
+12d51 7 153 332
+12d58 10 155 332
+12d68 f 156 332
+12d77 1e 158 332
+12d95 f 160 332
+12da4 f 161 332
+12db3 e 163 332
+12dc1 b 165 332
+12dcc 3 168 332
+12dcf 12 169 332
+FUNC 12e20 2b 4 atexit(())
+12e20 4 174 332
+12e24 23 175 332
+12e47 4 176 332
+FUNC 12e60 25 0 _RTC_Initialize()
+12e60 1 49 2163
+12e61 f 52 2163
+12e70 6 54 2163
+12e76 2 56 2163
+12e78 c 52 2163
+12e84 1 59 2163
+FUNC 12e90 25 0 _RTC_Terminate()
+12e90 1 63 2163
+12e91 f 66 2163
+12ea0 6 68 2163
+12ea6 2 70 2163
+12ea8 c 66 2163
+12eb4 1 73 2163
+PUBLIC 12ebe 0 _configthreadlocale
+FUNC 12ed0 26 18 _invoke_watson_if_error(int,wchar_t const *,wchar_t const *,wchar_t const *,unsigned int,unsigned int)
+12ed0 3 724 324
+12ed3 6 725 324
+12ed9 2 727 324
+12edb 19 729 324
+12ef4 2 730 324
+FUNC 12f00 35 0 _setdefaultprecision(...)
+12f00 3 30 1418
+12f03 30 31 1418
+12f33 2 32 1418
+PUBLIC 12f42 0 __setusermatherr
+PUBLIC 12f48 0 _initterm_e
+PUBLIC 12f4e 0 _initterm
+FUNC 12f60 27 10 _except_handler4(_EXCEPTION_RECORD *,_EXCEPTION_REGISTRATION_RECORD *,_CONTEXT *,void *)
+12f60 3 87 1327
+12f63 22 94 1327
+12f85 2 95 1327
+FUNC 12f90 136 0 GetPdbDll()
+12f90 13 254 2075
+12fa3 9 257 2075
+12fac 2 258 2075
+12fae e 322 2075
+12fbc 7 259 2075
+12fc3 d 264 2075
+12fd0 16 276 2075
+12fe6 17 278 2075
+12ffd 1f 282 2075
+1301c 10 284 2075
+1302c 13 286 2075
+1303f d 290 2075
+1304c 4 293 2075
+13050 e 300 2075
+1305e 4 301 2075
+13062 b 307 2075
+1306d 48 311 2075
+130b5 3 321 2075
+130b8 e 322 2075
+FUNC 13120 215 0 GetPdbDllFromInstallPath()
+13120 14 87 2075
+13134 17 94 2075
+1314b f 96 2075
+1315a d 100 2075
+13167 5 103 2075
+1316c 3 105 2075
+1316f f 204 2075
+1317e 18 109 2075
+13196 12 111 2075
+131a8 12 113 2075
+131ba 1b 118 2075
+131d5 4 119 2075
+131d9 7 121 2075
+131e0 5 122 2075
+131e5 e 204 2075
+131f3 32 129 2075
+13225 e 131 2075
+13233 7 132 2075
+1323a 4 134 2075
+1323e 9 139 2075
+13247 b 146 2075
+13252 2 153 2075
+13254 5 155 2075
+13259 f 162 2075
+13268 b 172 2075
+13273 e 174 2075
+13281 e 177 2075
+1328f e 182 2075
+1329d 4e 189 2075
+132eb 1a 193 2075
+13305 f 195 2075
+13314 e 199 2075
+13322 13 204 2075
+FUNC 133c0 cf c GetPdbDllPathFromFilePath(wchar_t const *,wchar_t *,unsigned int)
+133c0 1a 216 2075
+133da 37 226 2075
+13411 3 228 2075
+13414 e 248 2075
+13422 1a 232 2075
+1343c 1a 237 2075
+13456 22 242 2075
+13478 17 248 2075
+FUNC 134d0 2ae 18 _RTC_GetSrcLine(unsigned char *,wchar_t *,unsigned long,int *,wchar_t *,unsigned long)
+134d0 3 333 2075
+134d3 c 334 2075
+134df 4 335 2075
+134e3 8 343 2075
+134eb 12 345 2075
+134fd 3 349 2075
+13500 4 570 2075
+13504 13 352 2075
+13517 d 360 2075
+13524 7 366 2075
+1352b d 374 2075
+13538 4 378 2075
+1353c 4 570 2075
+13540 e 382 2075
+1354e 2 384 2075
+13550 2 387 2075
+13552 6 389 2075
+13558 6 391 2075
+1355e 4 396 2075
+13562 5 398 2075
+13567 8 389 2075
+1356f 4 406 2075
+13573 1 413 2075
+13574 9 419 2075
+1357d 17 421 2075
+13594 9 428 2075
+1359d 5 425 2075
+135a2 10 435 2075
+135b2 20 440 2075
+135d2 3 444 2075
+135d5 4 570 2075
+135d9 17 449 2075
+135f0 1a 458 2075
+1360a 19 469 2075
+13623 24 477 2075
+13647 d 484 2075
+13654 26 498 2075
+1367a 18 503 2075
+13692 11 484 2075
+136a3 b 505 2075
+136ae b 511 2075
+136b9 15 513 2075
+136ce 8 516 2075
+136d6 1d 523 2075
+136f3 3 528 2075
+136f6 4 530 2075
+136fa c 536 2075
+13706 5 538 2075
+1370b 5 536 2075
+13710 7 544 2075
+13717 25 546 2075
+1373c 7 551 2075
+13743 10 560 2075
+13753 a 562 2075
+1375d 8 564 2075
+13765 8 566 2075
+1376d a 568 2075
+13777 3 569 2075
+1377a 4 570 2075
+FUNC 13830 f 0 __security_check_cookie(unsigned int)
+13830 0 52 1586
+13830 6 55 1586
+13836 2 56 1586
+13838 2 57 1586
+1383a 5 59 1586
+PUBLIC 13842 0 terminate
+PUBLIC 13848 0 __crtSetUnhandledExceptionFilter
+PUBLIC 1384e 0 _lock
+PUBLIC 13854 0 _unlock
+PUBLIC 1385a 0 _calloc_dbg
+PUBLIC 13860 0 __dllonexit
+PUBLIC 13866 0 _invoke_watson
+PUBLIC 1386c 0 _controlfp_s
+PUBLIC 13872 0 _except_handler4_common
+PUBLIC 13878 0 wcscpy_s
+PUBLIC 1387e 0 _wmakepath_s
+PUBLIC 13884 0 _wsplitpath_s
+FUNC 13890 46 4 __raise_securityfailure(_EXCEPTION_POINTERS *)
+13890 3 64 598
+13893 b 66 598
+1389e a 67 598
+138a8 c 70 598
+138b4 9 79 598
+138bd a 81 598
+138c7 d 85 598
+138d4 2 86 598
+FUNC 138f0 102 0 __report_gsfailure()
+138f0 9 129 598
+138f9 b 145 598
+13904 7 147 598
+1390b 5 167 598
+13910 6 168 598
+13916 6 169 598
+1391c 6 170 598
+13922 6 171 598
+13928 6 172 598
+1392e 7 173 598
+13935 7 174 598
+1393c 7 175 598
+13943 7 176 598
+1394a 7 177 598
+13951 7 178 598
+13958 1 179 598
+13959 6 180 598
+1395f 3 187 598
+13962 5 188 598
+13967 3 189 598
+1396a 5 190 598
+1396f 3 191 598
+13972 5 192 598
+13977 6 198 598
+1397d a 201 598
+13987 a 202 598
+13991 a 214 598
+1399b a 215 598
+139a5 a 216 598
+139af 12 217 598
+139c1 11 224 598
+139d2 12 225 598
+139e4 a 232 598
+139ee 4 235 598
+FUNC 13a40 c 0 __report_rangecheckfailure()
+13a40 3 480 598
+13a43 7 481 598
+13a4a 2 482 598
+FUNC 13a50 d2 4 __report_securityfailure(unsigned long)
+13a50 9 386 598
+13a59 b 392 598
+13a64 5 394 598
+13a69 5 418 598
+13a6e 6 419 598
+13a74 6 420 598
+13a7a 6 421 598
+13a80 6 422 598
+13a86 6 423 598
+13a8c 7 424 598
+13a93 7 425 598
+13a9a 7 426 598
+13aa1 7 427 598
+13aa8 7 428 598
+13aaf 7 429 598
+13ab6 1 430 598
+13ab7 6 431 598
+13abd 3 438 598
+13ac0 5 439 598
+13ac5 3 440 598
+13ac8 5 441 598
+13acd 3 442 598
+13ad0 5 443 598
+13ad5 6 449 598
+13adb a 452 598
+13ae5 a 460 598
+13aef a 461 598
+13af9 a 463 598
+13b03 11 464 598
+13b14 a 471 598
+13b1e 4 474 598
+FUNC 13b60 125 c __report_securityfailureEx(unsigned long,unsigned long,void * *)
+13b60 9 258 598
+13b69 b 267 598
+13b74 5 269 598
+13b79 5 296 598
+13b7e 6 297 598
+13b84 6 298 598
+13b8a 6 299 598
+13b90 6 300 598
+13b96 6 301 598
+13b9c 7 302 598
+13ba3 7 303 598
+13baa 7 304 598
+13bb1 7 305 598
+13bb8 7 306 598
+13bbf 7 307 598
+13bc6 1 308 598
+13bc7 6 309 598
+13bcd 3 316 598
+13bd0 5 317 598
+13bd5 3 318 598
+13bd8 5 319 598
+13bdd 3 320 598
+13be0 5 321 598
+13be5 6 327 598
+13beb a 330 598
+13bf5 a 338 598
+13bff a 339 598
+13c09 c 341 598
+13c15 7 342 598
+13c1c 6 345 598
+13c22 9 346 598
+13c2b c 349 598
+13c37 11 350 598
+13c48 1a 352 598
+13c62 13 353 598
+13c75 2 354 598
+13c77 a 361 598
+13c81 4 364 598
+PUBLIC 13cce 0 _crt_debugger_hook
+PUBLIC 13cd4 0 __crtUnhandledException
+PUBLIC 13cda 0 __crtTerminateProcess
+PUBLIC 13ce0 4 EncodePointer
+PUBLIC 13ce6 0 IsDebuggerPresent
+PUBLIC 13cec 10 RaiseException
+PUBLIC 13cf2 0 GetLastError
+PUBLIC 13cf8 8 GetProcAddress
+PUBLIC 13cfe c LoadLibraryExW
+PUBLIC 13d04 4 lstrlenA
+PUBLIC 13d0a 4 LoadLibraryW
+PUBLIC 13d10 18 MultiByteToWideChar
+PUBLIC 13d16 20 WideCharToMultiByte
+PUBLIC 13d1c 4 QueryPerformanceCounter
+PUBLIC 13d22 0 GetCurrentProcessId
+PUBLIC 13d28 0 GetCurrentThreadId
+PUBLIC 13d2e 4 GetSystemTimeAsFileTime
+PUBLIC 13d34 4 DecodePointer
+PUBLIC 13d3a c HeapAlloc
+PUBLIC 13d40 c HeapFree
+PUBLIC 13d46 0 GetProcessHeap
+PUBLIC 13d4c c VirtualQuery
+PUBLIC 13d52 4 FreeLibrary
+PUBLIC 13d58 c GetModuleFileNameW
+PUBLIC 13d5e 4 GetModuleHandleW
+PUBLIC 13d64 4 IsProcessorFeaturePresent
+STACK WIN 4 11420 42 1e 0 10 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 11480 42 1e 0 14 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 114e0 44 1e 0 14 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 11540 44 1e 0 14 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 115a0 25 1e 0 14 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 11600 32 7 0 4 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11604 2a 3 0 4 4 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 4 - ^ = 
+STACK WIN 4 11605 28 2 0 4 8 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 4 - ^ =  $23 $T0 8 - ^ = 
+STACK WIN 4 11619 13 0 0 4 c 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 4 - ^ =  $23 $T0 8 - ^ =  $24 $T0 12 - ^ = 
+STACK WIN 4 11640 d1 c 0 4 0 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11645 c6 7 0 4 4 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ = 
+STACK WIN 4 11648 c2 4 0 4 8 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ =  $23 $T0 12 - ^ = 
+STACK WIN 4 11649 c0 3 0 4 c 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ =  $23 $T0 12 - ^ =  $24 $T0 16 - ^ = 
+STACK WIN 4 11750 58 d 0 0 0 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11755 4f 8 0 0 4 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ = 
+STACK WIN 4 11756 4d 7 0 0 8 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ =  $23 $T0 12 - ^ = 
+STACK WIN 4 11762 40 0 0 0 c 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ =  $23 $T0 12 - ^ =  $24 $T0 16 - ^ = 
+STACK WIN 4 117c0 25 0 0 0 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 117f0 29 0 0 0 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 11830 13 0 0 0 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 11850 88 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11900 58 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11970 b 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11980 237 33 0 0 10 2c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 20 - ^ =  $23 $T0 24 - ^ =  $24 $T0 28 - ^ = 
+STACK WIN 4 11b4e 1b 0 0 0 10 2c 0 1 $T0 $ebp = $T2 $esp = $T1 .raSearchStart = $eip $T1 ^ = $ebp $T0 = $esp $T1 4 + = 
+STACK WIN 4 11bc0 25 1e 0 10 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 11bf0 49 1e 0 8 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 11c50 82 6 0 0 0 c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11d00 f 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11d20 99 33 0 4 10 34 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 56 - ^ =  $23 $T0 60 - ^ =  $24 $T0 64 - ^ = 
+STACK WIN 4 11d86 13 0 0 4 10 34 0 1 $T0 $ebp = $T2 $esp = $T1 .raSearchStart = $eip $T1 ^ = $ebp $T0 = $esp $T1 4 + = 
+STACK WIN 4 11de0 ab 33 0 10 10 34 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 56 - ^ =  $23 $T0 60 - ^ =  $24 $T0 64 - ^ = 
+STACK WIN 4 11e58 13 0 0 10 10 34 0 1 $T0 $ebp = $T2 $esp = $T1 .raSearchStart = $eip $T1 ^ = $ebp $T0 = $esp $T1 4 + = 
+STACK WIN 4 11ec0 168 1b 0 c 0 144 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 11ed7 148 4 0 c 4 144 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 328 - ^ = 
+STACK WIN 4 11edb 141 0 0 c 8 144 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 328 - ^ =  $24 $T0 332 - ^ = 
+STACK WIN 4 11ef1 127 0 0 c c 144 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 328 - ^ =  $24 $T0 332 - ^ =  $23 $T0 336 - ^ = 
+STACK WIN 4 12030 49 1e 0 10 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 12090 4e 3 0 8 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12100 f9 13 0 8 0 408 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12130 bb 0 0 8 4 408 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 1036 - ^ = 
+STACK WIN 4 12131 b9 0 0 8 8 408 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 1036 - ^ =  $23 $T0 1040 - ^ = 
+STACK WIN 4 1217e 4d 0 0 8 c 408 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 1036 - ^ =  $23 $T0 1040 - ^ =  $24 $T0 1044 - ^ = 
+STACK WIN 4 12240 68 d 0 10 0 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 1224b 59 2 0 10 4 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ = 
+STACK WIN 4 1224c 57 1 0 10 8 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ =  $23 $T0 12 - ^ = 
+STACK WIN 4 1224d 47 0 0 10 c 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 8 - ^ =  $23 $T0 12 - ^ =  $24 $T0 16 - ^ = 
+STACK WIN 4 122d0 1ef 1f 0 10 0 e3c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 122e7 1cf 8 0 10 4 e3c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 3648 - ^ = 
+STACK WIN 4 122eb 1c8 4 0 10 8 e3c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 3648 - ^ =  $23 $T0 3652 - ^ = 
+STACK WIN 4 122ef 1c3 0 0 10 c e3c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 3648 - ^ =  $23 $T0 3652 - ^ =  $24 $T0 3656 - ^ = 
+STACK WIN 4 124c0 46 1e 0 8 c c0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 196 - ^ =  $23 $T0 200 - ^ =  $24 $T0 204 - ^ = 
+STACK WIN 4 12540 f7 13 0 4 0 404 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12564 c5 0 0 4 4 404 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 1032 - ^ = 
+STACK WIN 4 12565 c3 0 0 4 8 404 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 1032 - ^ =  $23 $T0 1036 - ^ = 
+STACK WIN 4 125be 4d 0 0 4 c 404 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 1032 - ^ =  $23 $T0 1036 - ^ =  $24 $T0 1040 - ^ = 
+STACK WIN 4 12680 6 0 0 4 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 12690 6 0 0 4 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 126a0 18 3 0 4 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 126c0 6 0 0 0 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 126d0 1d 3 0 4 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12700 1d 3 0 4 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12730 23 3 0 8 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12770 65 3 0 4 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 127f0 14 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12820 7 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12840 73 6 0 8 0 c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 128d0 12b 33 0 4 10 40 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 20 - ^ =  $23 $T0 24 - ^ =  $24 $T0 28 - ^ = 
+STACK WIN 4 129a5 27 0 0 4 10 40 0 1 $T0 $ebp = $T2 $esp = $T1 .raSearchStart = $eip $T1 ^ = $ebp $T0 = $esp $T1 4 + = 
+STACK WIN 4 12a50 5d 6 0 4 0 c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12ae0 dd 6 0 0 0 14 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12c00 7 3 0 4 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12c10 a9 4 0 0 0 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12cf0 f1 30 0 4 10 24 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 20 - ^ =  $23 $T0 24 - ^ =  $24 $T0 28 - ^ = 
+STACK WIN 4 12dc1 b 0 0 4 10 24 0 1 $T0 $ebp = $T2 $esp = $T1 .raSearchStart = $eip $T1 ^ = $ebp $T0 = $esp $T1 4 + = 
+STACK WIN 4 12e20 2b 4 0 4 0 4 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12e60 25 1 0 0 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 12e61 23 0 0 0 4 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + =  $23 $T0 4 - ^ = 
+STACK WIN 4 12e90 25 1 0 0 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 12e91 23 0 0 0 4 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + =  $23 $T0 4 - ^ = 
+STACK WIN 4 12ed0 26 3 0 18 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12f00 35 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12f60 27 3 0 10 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12f90 136 13 0 0 0 414 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 12fd1 e7 0 0 0 4 414 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $23 $T0 1048 - ^ = 
+STACK WIN 4 13120 215 1b 0 0 0 224 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 13134 1f8 7 0 0 4 224 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 552 - ^ = 
+STACK WIN 4 1313b 1ee 0 0 0 8 224 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 552 - ^ =  $24 $T0 556 - ^ = 
+STACK WIN 4 1317e 1aa 0 0 0 c 224 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 552 - ^ =  $24 $T0 556 - ^ =  $23 $T0 560 - ^ = 
+STACK WIN 4 133c0 cf 17 0 c 0 60c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 133d7 af 0 0 c 4 60c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $23 $T0 1552 - ^ = 
+STACK WIN 4 134d0 2ae 13 0 18 0 44 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 134e3 297 0 0 18 4 44 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 72 - ^ = 
+STACK WIN 4 13533 244 0 0 18 8 44 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 72 - ^ =  $23 $T0 76 - ^ = 
+STACK WIN 4 1354e 228 0 0 18 c 44 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + =  $20 $T0 72 - ^ =  $23 $T0 76 - ^ =  $24 $T0 80 - ^ = 
+STACK WIN 4 13830 f 0 0 0 0 0 0 1 $T0 .raSearch = $eip $T0 ^ = $esp $T0 4 + = 
+STACK WIN 4 13890 46 3 0 4 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 138f0 102 9 0 0 0 324 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 13a40 c 3 0 0 0 0 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 13a50 d2 9 0 4 0 31c 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 4 13b60 125 9 0 c 0 320 0 1 $T0 $ebp = $eip $T0 4 + ^ = $ebp $T0 ^ = $esp $T0 8 + = 
+STACK WIN 0 11b4e 1b 0 0 0 0 0 0 0 0
+STACK WIN 0 11d86 13 0 0 0 0 0 0 0 0
+STACK WIN 0 11e58 13 0 0 0 0 0 0 0 0
+STACK WIN 0 129a5 27 0 0 0 0 0 0 0 0
+STACK WIN 0 12dc1 b 0 0 0 0 0 0 0 0

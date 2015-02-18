@@ -55,19 +55,31 @@
       'sources': [
             'PDBParser.cpp',
             'utils.cpp',
-      ]
+      ],
+      'direct_dependent_settings': {
+          'include_dirs': [
+              '<(DEPTH)',
+          ],
+      },
     },
     {
-      'target_name': 'dump_syms_unittest',
-      'type': 'executable',
-      'sources': [
-        'testing/dump_syms_unittest.cpp',
-      ],
-      'dependencies': [
-        '<(DEPTH)/testing/testing.gyp:gmock',
-        '<(DEPTH)/testing/testing.gyp:gtest',
-        'dump_syms',
-      ],
+        'target_name': 'dump_syms_unittest',
+        'type': 'executable',
+        'sources': [
+            'testing/dump_syms_unittest.cpp',
+        ],
+        'conditions': [
+            ['OS=="win"', {
+                'sources': [
+                    'testing/memstream.cpp',
+                ],
+            }],
+        ],
+        'dependencies': [
+            '<(DEPTH)/testing/testing.gyp:gmock',
+            '<(DEPTH)/testing/testing.gyp:gtest',
+            'pdb_parser',
+        ],
     },
     ]
 }

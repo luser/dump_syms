@@ -23,6 +23,7 @@ build_script:
   - msbuild dump_syms.sln /clp:Verbosity=minimal /nologo /p:Configuration=Default;Platform=%MSBUILD_PLATFORM%
 
 test_script:
+  - set TESTDATA_DIR=testing\testdata
   - .\Default\dump_syms_unittest.exe
 
 deploy: off
