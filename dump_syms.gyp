@@ -4,20 +4,24 @@
         'have_tbb': '<!(python wrap-pkg-config.py --atleast-version=2.2 tbb)',
     },
     'target_defaults': {
-    'conditions': [
-            ['OS=="win"', {
-                'msvs_settings': {
-                    'VCCLCompilerTool': {
-                        'ExceptionHandling': '1',
-                        'WarnAsError': 'true',
-                        'Optimization': '0',
-                        #'AdditionalOptions': ['/MP'],
-                    },
-                    'VCLinkerTool': {
-                        'SubSystem': '1',
-                    },
-                },
-            }, { # OS != "win"
+        'xcode_settings': {
+            'CLANG_CXX_LANGUAGE_STANDARD': 'c++0x',
+            'WARNING_CFLAGS': ['-Wall'],
+            'GCC_TREAT_WARNINGS_AS_ERRORS': 'YES',
+        },
+        'msvs_settings': {
+            'VCCLCompilerTool': {
+                'ExceptionHandling': '1',
+                'WarnAsError': 'true',
+                'Optimization': '0',
+                #'AdditionalOptions': ['/MP'],
+            },
+            'VCLinkerTool': {
+                'SubSystem': '1',
+            },
+        },
+        'conditions': [
+            ['OS=="linux"', {
                 'cflags': [
                     '-g',
                     '-Wall',
@@ -71,9 +75,18 @@
         'conditions': [
             ['OS=="win"', {
                 'sources': [
-                    'testing/memstream.cpp',
+                    'testing/memstream_win.cpp',
                 ],
             }],
+            ['OS=="mac"', {
+                'sources': [
+                    'testing/memstream_mac.c',
+                ],
+            }],
+        ],
+
+        'include_dirs': [
+            'testing',
         ],
         'dependencies': [
             '<(DEPTH)/testing/testing.gyp:gmock',

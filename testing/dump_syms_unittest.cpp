@@ -32,7 +32,13 @@
 #include <stdlib.h>
 
 #ifdef _WIN32
-#include "memstream.h"
+#include "memstream_win.h"
+#endif
+
+#ifdef __APPLE__
+extern "C" {
+#include "memstream_mac.h"
+}
 #endif
 
 using std::string;
