@@ -1,3 +1,7 @@
+# This project is not actively maintained
+
+You probably want [the Mozilla Rust rewrite](https://github.com/mozilla/dump_syms/)
+
 A reimplementation of the [Breakpad](https://code.google.com/p/google-breakpad/) Windows dump_syms tool.
 
 [![Build Status](https://travis-ci.org/luser/dump_syms.svg?branch=master)](https://travis-ci.org/luser/dump_syms)
